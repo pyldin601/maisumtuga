@@ -11,8 +11,7 @@
   background: var(--black);
   color-scheme: dark;
   font-family:
-    "Avenir Next", Avenir, "Helvetica Neue", Arial, ui-sans-serif, system-ui,
-    sans-serif;
+    "Avenir Next", Avenir, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -122,8 +121,10 @@ body {
   caret-color: var(--white-strong);
   box-shadow: none;
   font:
-    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 "SFMono-Regular", Consolas,
-    "Liberation Mono", monospace;
+    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
   outline: none;
 }
 
@@ -145,8 +146,10 @@ body {
   pointer-events: none;
   white-space: nowrap;
   font:
-    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 "SFMono-Regular", Consolas,
-    "Liberation Mono", monospace;
+    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
 }
 
 .answer-text {

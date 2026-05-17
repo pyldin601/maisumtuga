@@ -28,18 +28,42 @@ function normalizeAnswer(value) {
 }
 
 function AnimatedPrompt({ parts, speed = 45 }) {
-  const [visibleLength, setVisibleLength] = useState(0);
   const text = useMemo(() => parts.map((part) => part.text).join(""), [parts]);
+  const shouldReduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+  const [visibleLength, setVisibleLength] = useState(() =>
+    shouldReduceMotion ? text.length : 0
+  );
+  const visibleParts = useMemo(
+    () =>
+      parts.reduce(
+        (result, part) => {
+          const availableCharacters = Math.max(
+            visibleLength - result.consumedCharacters,
+            0
+          );
+          const visibleText = part.text.slice(0, availableCharacters);
+
+          return {
+            consumedCharacters: result.consumedCharacters + part.text.length,
+            items: visibleText
+              ? result.items.concat({
+                  muted: part.muted,
+                  text: visibleText,
+                })
+              : result.items,
+          };
+        },
+        { consumedCharacters: 0, items: [] }
+      ).items,
+    [parts, visibleLength]
+  );
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-    if (reduceMotion.matches) {
-      setVisibleLength(text.length);
+    if (shouldReduceMotion) {
       return undefined;
     }
-
-    setVisibleLength(0);
 
     const intervalId = window.setInterval(() => {
       setVisibleLength((length) => {
@@ -53,26 +77,15 @@ function AnimatedPrompt({ parts, speed = 45 }) {
     }, speed);
 
     return () => window.clearInterval(intervalId);
-  }, [speed, text]);
-
-  let remainingCharacters = visibleLength;
+  }, [shouldReduceMotion, speed, text.length]);
 
   return (
     <p aria-label={text}>
-      {parts.map((part) => {
-        const visibleText = part.text.slice(0, remainingCharacters);
-        remainingCharacters -= visibleText.length;
-
-        if (!visibleText) {
-          return null;
-        }
-
-        return (
-          <span className={part.muted ? "muted" : undefined} key={part.text}>
-            {visibleText}
-          </span>
-        );
-      })}
+      {visibleParts.map((part, index) => (
+        <span className={part.muted ? "muted" : undefined} key={index}>
+          {part.text}
+        </span>
+      ))}
       {visibleLength < text.length && (
         <span className="typing-caret" aria-hidden="true" />
       )}
@@ -124,16 +137,15 @@ export default function App() {
         return currentRows;
       }
 
-      return currentRows
-        .map((item) =>
-          item.id === rowId
-            ? {
-                ...item,
-                answer,
-                status,
-              }
-            : item
-        );
+      return currentRows.map((item) =>
+        item.id === rowId
+          ? {
+              ...item,
+              answer,
+              status,
+            }
+          : item
+      );
     });
 
     nextQuizTimeoutRef.current = window.setTimeout(() => {
@@ -150,9 +162,7 @@ export default function App() {
           return currentRows;
         }
 
-        return currentRows.concat(
-          createQuizRow((row.quizIndex + 1) % quizzes.length)
-        );
+        return currentRows.concat(createQuizRow((row.quizIndex + 1) % quizzes.length));
       });
     }, nextQuizDelay);
   }
@@ -228,9 +238,7 @@ export default function App() {
                   {row.answer ? (
                     <span className="answer-text">{row.answer}</span>
                   ) : (
-                    <span className="answer-placeholder">
-                      escreve só forma verbal
-                    </span>
+                    <span className="answer-placeholder">escreve só forma verbal</span>
                   )}
                   {isCorrect && <span className="check">✓</span>}
                   {isWrong && <span className="wrong">×</span>}
@@ -246,9 +254,7 @@ export default function App() {
                     spellCheck="false"
                     type="text"
                     value={row.answer}
-                    onChange={(event) =>
-                      handleAnswerChange(row.id, event.target.value)
-                    }
+                    onChange={(event) => handleAnswerChange(row.id, event.target.value)}
                     onKeyDown={(event) => handleAnswerKeyDown(event, row)}
                   />
                 </span>

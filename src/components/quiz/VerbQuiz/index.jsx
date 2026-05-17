@@ -162,7 +162,11 @@ export default function VerbQuiz({
         {isActive ? <AnimatedPrompt parts={promptParts} /> : <StaticPrompt parts={promptParts} />}
       </div>
 
-      <label className="quiz__answer-line">
+      <label
+        className={classNames('quiz__answer-line', {
+          'quiz__answer-line--wrong': isWrong,
+        })}
+      >
         <span className="sr-only">Resposta</span>
         <span className="answer-display" aria-hidden="true">
           {typedAnswer ? (

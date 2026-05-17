@@ -101,6 +101,10 @@ body {
   cursor: text;
 }
 
+.quiz__answer-line--wrong {
+  animation: answer-shake 180ms ease-out;
+}
+
 .quiz__answer {
   display: block;
 }
@@ -182,8 +186,28 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .quiz__answer-line--wrong,
   .typing-caret {
     animation: none;
+  }
+}
+
+@keyframes answer-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-0.88rem);
+  }
+
+  50% {
+    transform: translateX(0.72rem);
+  }
+
+  75% {
+    transform: translateX(-0.4rem);
   }
 }
 

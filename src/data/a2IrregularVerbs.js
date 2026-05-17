@@ -1,10 +1,4 @@
-export const a2VerbSubjects = [
-  'eu',
-  'tu',
-  'você/ele/ela',
-  'nós',
-  'vocês/eles/elas',
-];
+export const a2VerbSubjects = ['eu', 'tu', 'você/ele/ela', 'nós', 'vocês/eles/elas'];
 
 function forms(values) {
   return a2VerbSubjects.map((subject, index) => ({

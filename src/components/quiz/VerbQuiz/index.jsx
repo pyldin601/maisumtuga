@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const promptAnimationSpeed = 22.5;
 
 function getPromptParts({ infinitiveForm, subject, time }) {
   return [
     { text: `${subject} ` },
-    { text: "+", muted: true },
+    { text: '+', muted: true },
     { text: ` ${infinitiveForm} ` },
-    { text: "/", muted: true },
+    { text: '/', muted: true },
     { text: ` ${time}` },
   ];
 }
@@ -15,27 +15,20 @@ function getPromptParts({ infinitiveForm, subject, time }) {
 function normalizeAnswer(value) {
   return value
     .trim()
-    .toLocaleLowerCase("pt-PT")
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
+    .toLocaleLowerCase('pt-PT')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
 }
 
 function AnimatedPrompt({ parts, speed = promptAnimationSpeed }) {
-  const text = useMemo(() => parts.map((part) => part.text).join(""), [parts]);
-  const shouldReduceMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
-  const [visibleLength, setVisibleLength] = useState(() =>
-    shouldReduceMotion ? text.length : 0
-  );
+  const text = useMemo(() => parts.map((part) => part.text).join(''), [parts]);
+  const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const [visibleLength, setVisibleLength] = useState(() => (shouldReduceMotion ? text.length : 0));
   const visibleParts = useMemo(
     () =>
       parts.reduce(
         (result, part) => {
-          const availableCharacters = Math.max(
-            visibleLength - result.consumedCharacters,
-            0
-          );
+          const availableCharacters = Math.max(visibleLength - result.consumedCharacters, 0);
           const visibleText = part.text.slice(0, availableCharacters);
 
           return {
@@ -75,13 +68,11 @@ function AnimatedPrompt({ parts, speed = promptAnimationSpeed }) {
   return (
     <p aria-label={text}>
       {visibleParts.map((part, index) => (
-        <span className={part.muted ? "muted" : undefined} key={index}>
+        <span className={part.muted ? 'muted' : undefined} key={index}>
           {part.text}
         </span>
       ))}
-      {visibleLength < text.length && (
-        <span className="typing-caret" aria-hidden="true" />
-      )}
+      {visibleLength < text.length && <span className="typing-caret" aria-hidden="true" />}
     </p>
   );
 }
@@ -90,7 +81,7 @@ function StaticPrompt({ parts }) {
   return (
     <p>
       {parts.map((part) => (
-        <span className={part.muted ? "muted" : undefined} key={part.text}>
+        <span className={part.muted ? 'muted' : undefined} key={part.text}>
           {part.text}
         </span>
       ))}
@@ -108,15 +99,12 @@ export default function VerbQuiz({
   subject,
   time,
 }) {
-  const [typedAnswer, setTypedAnswer] = useState("");
-  const [status, setStatus] = useState("active");
+  const [typedAnswer, setTypedAnswer] = useState('');
+  const [status, setStatus] = useState('active');
   const inputRef = useRef(null);
-  const promptParts = useMemo(
-    () => getPromptParts({ infinitiveForm, subject, time }),
-    [infinitiveForm, subject, time]
-  );
-  const isCorrect = status === "correct";
-  const isWrong = status === "wrong";
+  const promptParts = useMemo(() => getPromptParts({ infinitiveForm, subject, time }), [infinitiveForm, subject, time]);
+  const isCorrect = status === 'correct';
+  const isWrong = status === 'wrong';
   const isResolved = isCorrect || isWrong;
 
   useEffect(() => {
@@ -127,7 +115,7 @@ export default function VerbQuiz({
 
   function resolveCorrect() {
     setTypedAnswer(answer);
-    setStatus("correct");
+    setStatus('correct');
     onCorrect({
       answer,
       expectedAnswer: answer,
@@ -138,7 +126,7 @@ export default function VerbQuiz({
   }
 
   function resolveWrong() {
-    setStatus("wrong");
+    setStatus('wrong');
     onWrong({
       answer: typedAnswer,
       expectedAnswer: answer,
@@ -159,7 +147,7 @@ export default function VerbQuiz({
   }
 
   function handleAnswerKeyDown(event) {
-    if (event.key !== "Enter" || !typedAnswer.trim() || isResolved) {
+    if (event.key !== 'Enter' || !typedAnswer.trim() || isResolved) {
       return;
     }
 
@@ -170,11 +158,7 @@ export default function VerbQuiz({
   return (
     <>
       <div className="quiz__prompt">
-        {isActive ? (
-          <AnimatedPrompt parts={promptParts} />
-        ) : (
-          <StaticPrompt parts={promptParts} />
-        )}
+        {isActive ? <AnimatedPrompt parts={promptParts} /> : <StaticPrompt parts={promptParts} />}
       </div>
 
       <label className="quiz__answer-line">

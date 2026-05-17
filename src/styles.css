@@ -162,13 +162,6 @@ body {
   white-space: nowrap;
 }
 
-@media (max-width: 560px) {
-  .quiz {
-    align-self: start;
-    padding-top: 18vh;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .typing-caret {
     animation: none;

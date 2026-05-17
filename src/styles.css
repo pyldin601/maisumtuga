@@ -1,0 +1,138 @@
+:root {
+  --black: #11100d;
+  --white: #f4f1e8;
+  --white-strong: #f8f5eb;
+  --white-muted: rgba(244, 241, 232, 0.72);
+  --white-faint: rgba(244, 241, 232, 0.36);
+  --green: #73d68a;
+
+  color: var(--white);
+  background: var(--black);
+  color-scheme: dark;
+  font-family:
+    "Avenir Next", Avenir, "Helvetica Neue", Arial, ui-sans-serif, system-ui,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  background: var(--black);
+}
+
+body {
+  min-height: 100vh;
+  color: var(--white);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(244, 241, 232, 0.07), transparent 31rem),
+    var(--black);
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+}
+
+.quiz {
+  width: min(100%, 34rem);
+  display: grid;
+  gap: 1.35rem;
+}
+
+.quiz__prompt p {
+  margin: 0;
+  color: var(--white-muted);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: clamp(0.92rem, 3vw, 1.35rem);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--white-faint);
+}
+
+.quiz__answer-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.5rem;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quiz__answer {
+  min-width: 0;
+}
+
+.quiz__answer input {
+  width: 100%;
+  min-height: 4.15rem;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  color: var(--white-strong);
+  background: transparent;
+  box-shadow: none;
+  font:
+    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 "SFMono-Regular", Consolas,
+    "Liberation Mono", monospace;
+  outline: none;
+}
+
+.quiz__answer input:focus {
+  background: transparent;
+}
+
+.quiz__answer input::placeholder {
+  color: rgba(244, 241, 232, 0.28);
+}
+
+.quiz__result {
+  min-height: 2.5rem;
+  display: grid;
+  place-items: center;
+}
+
+.check {
+  width: 2.5rem;
+  aspect-ratio: 1;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(115, 214, 138, 0.35);
+  border-radius: 999px;
+  color: var(--green);
+  background: rgba(115, 214, 138, 0.1);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.sr-only {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .quiz {
+    align-self: start;
+    padding-top: 18vh;
+  }
+}

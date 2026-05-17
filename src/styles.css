@@ -162,8 +162,7 @@ body {
   color: rgba(244, 241, 232, 0.28);
 }
 
-.check,
-.wrong {
+.check {
   display: inline-block;
   font-size: clamp(1.5rem, 5vw, 2.35rem);
   line-height: 1;
@@ -171,10 +170,6 @@ body {
 
 .check {
   color: var(--green);
-}
-
-.wrong {
-  color: var(--red);
 }
 
 .sr-only {

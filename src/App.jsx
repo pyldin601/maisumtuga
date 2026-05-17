@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import VerbQuiz from "./components/quiz/VerbQuiz";
-import { a2Verbs } from "./data/a2IrregularVerbs";
+import { useEffect, useRef, useState } from 'react';
+
+import VerbQuiz from './components/quiz/VerbQuiz';
+import { a2Verbs } from './data/a2IrregularVerbs';
 
 const nextQuizDelay = 250;
 const quizStream = a2Verbs.flatMap((verb) =>
@@ -35,12 +36,7 @@ export default function App() {
   function handleResolved(rowId) {
     setRows((currentRows) =>
       currentRows.map((row) =>
-        row.id === rowId
-          ? {
-              ...row,
-              resolved: true,
-            }
-          : row
+        row.id === rowId ? { ...row, resolved: true } : row
       )
     );
 
@@ -79,9 +75,11 @@ export default function App() {
 
           return (
             <section
-              className={isHistory ? "quiz quiz--history" : "quiz quiz--active"}
+              className={isHistory ? 'quiz quiz--history' : 'quiz quiz--active'}
               key={row.id}
-              style={{ "--row-offset": index - rows.length + 1 }}
+              style={{
+                '--row-offset': index - rows.length + 1,
+              }}
             >
               <VerbQuiz
                 answer={currentQuiz.answer}

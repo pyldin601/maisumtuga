@@ -34,11 +34,7 @@ export default function App() {
   }, []);
 
   function handleResolved(rowId) {
-    setRows((currentRows) =>
-      currentRows.map((row) =>
-        row.id === rowId ? { ...row, resolved: true } : row
-      )
-    );
+    setRows((currentRows) => currentRows.map((row) => (row.id === rowId ? { ...row, resolved: true } : row)));
 
     nextQuizTimeoutRef.current = window.setTimeout(() => {
       setRows((currentRows) => {
@@ -54,20 +50,22 @@ export default function App() {
           return currentRows;
         }
 
-        return currentRows.concat(
-          createStreamRow((row.answerIndex + 1) % quizStream.length)
-        );
+        return currentRows.concat(createStreamRow((row.answerIndex + 1) % quizStream.length));
       });
     }, nextQuizDelay);
   }
 
+  function handleCorrect(rowId) {
+    handleResolved(rowId);
+  }
+
+  function handleWrong(rowId) {
+    handleResolved(rowId);
+  }
+
   return (
     <main className="page">
-      <form
-        className="quiz-flow"
-        aria-label="Portuguese verb quiz"
-        onSubmit={(event) => event.preventDefault()}
-      >
+      <form className="quiz-flow" aria-label="Portuguese verb quiz" onSubmit={(event) => event.preventDefault()}>
         {rows.map((row, index) => {
           const currentQuiz = quizStream[row.answerIndex];
           const isActive = !row.resolved;
@@ -86,8 +84,8 @@ export default function App() {
                 autoFocus={isActive}
                 infinitiveForm={currentQuiz.infinitiveForm}
                 isActive={isActive}
-                onCorrect={() => handleResolved(row.id)}
-                onWrong={() => handleResolved(row.id)}
+                onCorrect={() => handleCorrect(row.id)}
+                onWrong={() => handleWrong(row.id)}
                 subject={currentQuiz.subject}
                 time={currentQuiz.time}
               />

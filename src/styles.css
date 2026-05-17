@@ -5,6 +5,7 @@
   --white-muted: rgba(244, 241, 232, 0.72);
   --white-faint: rgba(244, 241, 232, 0.36);
   --green: #73d68a;
+  --red: #e2776f;
 
   color: var(--white);
   background: var(--black);
@@ -68,25 +69,38 @@ body {
   color: var(--white-faint);
 }
 
-.quiz__answer-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 2.5rem;
-  align-items: center;
-  gap: 1rem;
+.typing-caret {
+  width: 0.08em;
+  height: 1.1em;
+  display: inline-block;
+  margin-left: 0.12em;
+  vertical-align: -0.16em;
+  background: var(--white-muted);
+  animation: blink 1s steps(1, end) infinite;
+}
+
+.quiz__answer-line {
+  min-height: 4.15rem;
+  position: relative;
+  display: block;
+  cursor: text;
 }
 
 .quiz__answer {
-  min-width: 0;
+  display: block;
 }
 
 .quiz__answer input {
   width: 100%;
   min-height: 4.15rem;
+  position: absolute;
+  inset: 0;
   border: 0;
   border-radius: 0;
   padding: 0;
-  color: var(--white-strong);
+  color: transparent;
   background: transparent;
+  caret-color: var(--white-strong);
   box-shadow: none;
   font:
     400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 "SFMono-Regular", Consolas,
@@ -98,27 +112,45 @@ body {
   background: transparent;
 }
 
-.quiz__answer input::placeholder {
+.quiz__answer input:disabled {
+  -webkit-text-fill-color: transparent;
+  opacity: 1;
+}
+
+.answer-display {
+  min-height: 4.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+  font:
+    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 "SFMono-Regular", Consolas,
+    "Liberation Mono", monospace;
+}
+
+.answer-text {
+  color: var(--white-strong);
+}
+
+.answer-placeholder {
   color: rgba(244, 241, 232, 0.28);
 }
 
-.quiz__result {
-  min-height: 2.5rem;
-  display: grid;
-  place-items: center;
+.check,
+.wrong {
+  display: inline-block;
+  font-size: clamp(1.5rem, 5vw, 2.35rem);
+  line-height: 1;
 }
 
 .check {
-  width: 2.5rem;
-  aspect-ratio: 1;
-  display: inline-grid;
-  place-items: center;
-  border: 1px solid rgba(115, 214, 138, 0.35);
-  border-radius: 999px;
   color: var(--green);
-  background: rgba(115, 214, 138, 0.1);
-  font-size: 1.5rem;
-  line-height: 1;
+}
+
+.wrong {
+  color: var(--red);
 }
 
 .sr-only {
@@ -134,5 +166,17 @@ body {
   .quiz {
     align-self: start;
     padding-top: 18vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing-caret {
+    animation: none;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
   }
 }

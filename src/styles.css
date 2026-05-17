@@ -45,15 +45,34 @@ body {
 
 .page {
   min-height: 100vh;
+  position: relative;
   display: grid;
-  place-items: center;
-  padding: clamp(1rem, 4vw, 2.5rem);
+  justify-items: center;
+  overflow: hidden;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.quiz-flow {
+  width: min(100%, 34rem);
+  min-height: 100vh;
+  position: relative;
 }
 
 .quiz {
-  width: min(100%, 34rem);
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 0;
   display: grid;
   gap: 1.35rem;
+  transform: translateY(calc(-50% + (var(--row-offset) * 11rem)));
+  transition:
+    opacity 180ms ease,
+    transform 240ms ease;
+}
+
+.quiz--history {
+  opacity: 0.58;
 }
 
 .quiz__prompt p {

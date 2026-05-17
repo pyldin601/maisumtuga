@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import VerbQuiz from './components/quiz/VerbQuiz';
 import { a2Verbs } from './data/a2IrregularVerbs';
+import { LeitnerState } from './state.js';
 
 const nextQuizDelay = 250;
 const quizStream = a2Verbs.flatMap((verb) =>
@@ -9,7 +10,8 @@ const quizStream = a2Verbs.flatMap((verb) =>
     forms.map((form) => ({
       answer: form.form,
       infinitiveForm: verb.infinitive,
-      subject: form.subject,
+      subjectFull: form.subjectFull,
+      subjectShort: form.subjectShort,
       time,
     }))
   )
@@ -22,6 +24,9 @@ function createStreamRow(answerIndex = 0) {
     resolved: false,
   };
 }
+
+const state = LeitnerState.fromStorage();
+const quizzes = quizStream.filter((quiz) => state.isItemDue(quiz));
 
 export default function App() {
   const [rows, setRows] = useState(() => [createStreamRow()]);
@@ -50,16 +55,26 @@ export default function App() {
           return currentRows;
         }
 
-        return currentRows.concat(createStreamRow((row.answerIndex + 1) % quizStream.length));
+        return currentRows.concat(createStreamRow((row.answerIndex + 1) % quizzes.length));
       });
     }, nextQuizDelay);
   }
 
   function handleCorrect(rowId) {
+    const row = rows.find((item) => item.id === rowId);
+    if (row) {
+      const item = quizzes[row.answerIndex];
+      state.moveItemToNextBox(item);
+    }
     handleResolved(rowId);
   }
 
   function handleWrong(rowId) {
+    const row = rows.find((item) => item.id === rowId);
+    if (row) {
+      const item = quizzes[row.answerIndex];
+      state.moveItemToFirstBox(item);
+    }
     handleResolved(rowId);
   }
 
@@ -67,7 +82,7 @@ export default function App() {
     <main className="page">
       <form className="quiz-flow" aria-label="Portuguese verb quiz" onSubmit={(event) => event.preventDefault()}>
         {rows.map((row, index) => {
-          const currentQuiz = quizStream[row.answerIndex];
+          const currentQuiz = quizzes[row.answerIndex];
           const isActive = !row.resolved;
           const isHistory = !isActive && index < rows.length - 1;
 
@@ -86,7 +101,7 @@ export default function App() {
                 isActive={isActive}
                 onCorrect={() => handleCorrect(row.id)}
                 onWrong={() => handleWrong(row.id)}
-                subject={currentQuiz.subject}
+                subject={currentQuiz.subjectFull}
                 time={currentQuiz.time}
               />
             </section>

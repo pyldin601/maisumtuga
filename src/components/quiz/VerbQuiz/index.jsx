@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import classNames from 'classnames';
 
 const promptAnimationSpeed = 22.5;
 
@@ -165,12 +166,18 @@ export default function VerbQuiz({
         <span className="sr-only">Resposta</span>
         <span className="answer-display" aria-hidden="true">
           {typedAnswer ? (
-            <span className="answer-text">{typedAnswer}</span>
+            <span
+              className={classNames('answer-text', {
+                'answer-text--wrong': isWrong,
+              })}
+            >
+              {typedAnswer}
+            </span>
           ) : (
             <span className="answer-placeholder">escreve só forma verbal</span>
           )}
           {isCorrect && <span className="check">✓</span>}
-          {isWrong && <span className="wrong">×</span>}
+          {isWrong && <>{answer}</>}
         </span>
 
         <span className="quiz__answer">

@@ -153,6 +153,11 @@ body {
   color: var(--white-strong);
 }
 
+.answer-text--wrong {
+  text-decoration: line-through;
+  color: var(--red);
+}
+
 .answer-placeholder {
   color: rgba(244, 241, 232, 0.28);
 }

@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import VerbQuiz from "./components/quiz/VerbQuiz";
+import { a2Verbs } from "./data/a2IrregularVerbs";
 
 const nextQuizDelay = 250;
-const cairPresentAnswers = [
-  { subject: "eu", answer: "caio" },
-  { subject: "tu", answer: "cais" },
-  { subject: "você/ele/ela", answer: "cai" },
-  { subject: "nós", answer: "caímos" },
-  { subject: "vocês/eles/elas", answer: "caem" },
-];
+const quizStream = a2Verbs.flatMap((verb) =>
+  Object.entries(verb.times).flatMap(([time, forms]) =>
+    forms.map((form) => ({
+      answer: form.form,
+      infinitiveForm: verb.infinitive,
+      subject: form.subject,
+      time,
+    }))
+  )
+);
 
 function createStreamRow(answerIndex = 0) {
   return {
@@ -55,7 +59,7 @@ export default function App() {
         }
 
         return currentRows.concat(
-          createStreamRow((row.answerIndex + 1) % cairPresentAnswers.length)
+          createStreamRow((row.answerIndex + 1) % quizStream.length)
         );
       });
     }, nextQuizDelay);
@@ -69,7 +73,7 @@ export default function App() {
         onSubmit={(event) => event.preventDefault()}
       >
         {rows.map((row, index) => {
-          const currentAnswer = cairPresentAnswers[row.answerIndex];
+          const currentQuiz = quizStream[row.answerIndex];
           const isActive = !row.resolved;
           const isHistory = !isActive && index < rows.length - 1;
 
@@ -80,14 +84,14 @@ export default function App() {
               style={{ "--row-offset": index - rows.length + 1 }}
             >
               <VerbQuiz
-                answer={currentAnswer.answer}
+                answer={currentQuiz.answer}
                 autoFocus={isActive}
-                infinitiveForm="cair"
+                infinitiveForm={currentQuiz.infinitiveForm}
                 isActive={isActive}
                 onCorrect={() => handleResolved(row.id)}
                 onWrong={() => handleResolved(row.id)}
-                subject={currentAnswer.subject}
-                time="presente"
+                subject={currentQuiz.subject}
+                time={currentQuiz.time}
               />
             </section>
           );

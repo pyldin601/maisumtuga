@@ -1,16 +1,31 @@
 const PROGRESS_KEY = 'leitner-progress';
 
-export function getKey(item) {
+type QuizItem = {
+  infinitiveForm: string;
+  subjectShort: string;
+  time: string;
+};
+
+type WordProgress = {
+  box: number;
+  due: number;
+};
+
+type Progress = Record<string, WordProgress>;
+
+export function getKey(item: QuizItem): string {
   return `${item.infinitiveForm}-${item.time}-${item.subjectShort}`;
 }
 
 export class LeitnerState {
-  constructor(progress) {
+  progress: Progress;
+
+  constructor(progress: Progress) {
     // key -> { box, due }
     this.progress = progress;
   }
 
-  static fromStorage() {
+  static fromStorage(): LeitnerState {
     const progress = localStorage.getItem(PROGRESS_KEY);
 
     if (!progress) {
@@ -20,7 +35,7 @@ export class LeitnerState {
     return new LeitnerState(JSON.parse(progress));
   }
 
-  moveItemToNextBox(item) {
+  moveItemToNextBox(item: QuizItem): void {
     const key = getKey(item);
     const wordProgress = this.progress[key];
 
@@ -50,7 +65,7 @@ export class LeitnerState {
     this.save();
   }
 
-  moveItemToFirstBox(item) {
+  moveItemToFirstBox(item: QuizItem): void {
     const key = getKey(item);
     const nextBox = 1;
     const nextDue = new Date();
@@ -60,7 +75,7 @@ export class LeitnerState {
     this.save();
   }
 
-  isItemDue(item) {
+  isItemDue(item: QuizItem): boolean {
     const key = getKey(item);
     const wordProgress = this.progress[key];
 
@@ -73,7 +88,7 @@ export class LeitnerState {
     return now >= wordProgress.due;
   }
 
-  save() {
+  save(): void {
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(this.progress));
   }
 }

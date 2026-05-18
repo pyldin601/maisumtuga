@@ -1,9 +1,43 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ChangeEvent, type KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 
 const promptAnimationSpeed = 22.5;
 
-function getPromptParts({ infinitiveForm, subject, time }) {
+type PromptPart = {
+  muted?: boolean;
+  text: string;
+};
+
+type PromptProps = {
+  parts: PromptPart[];
+};
+
+type AnimatedPromptProps = PromptProps & {
+  speed?: number;
+};
+
+type QuizResult = {
+  answer: string;
+  expectedAnswer: string;
+  infinitiveForm: string;
+  subject: string;
+  time: string;
+};
+
+type VerbQuizProps = {
+  answer: string;
+  autoFocus?: boolean;
+  infinitiveForm: string;
+  isActive?: boolean;
+  onCorrect?: (result: QuizResult) => void;
+  onWrong?: (result: QuizResult) => void;
+  subject: string;
+  time: string;
+};
+
+type PromptInput = Pick<VerbQuizProps, 'infinitiveForm' | 'subject' | 'time'>;
+
+function getPromptParts({ infinitiveForm, subject, time }: PromptInput): PromptPart[] {
   return [
     { text: `${subject} ` },
     { text: '+', muted: true },
@@ -13,7 +47,7 @@ function getPromptParts({ infinitiveForm, subject, time }) {
   ];
 }
 
-function normalizeAnswer(value) {
+function normalizeAnswer(value: string): string {
   return value
     .trim()
     .toLocaleLowerCase('pt-PT')
@@ -21,7 +55,7 @@ function normalizeAnswer(value) {
     .replace(/\p{Diacritic}/gu, '');
 }
 
-function AnimatedPrompt({ parts, speed = promptAnimationSpeed }) {
+function AnimatedPrompt({ parts, speed = promptAnimationSpeed }: AnimatedPromptProps) {
   const text = useMemo(() => parts.map((part) => part.text).join(''), [parts]);
   const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [visibleLength, setVisibleLength] = useState(() => (shouldReduceMotion ? text.length : 0));
@@ -42,7 +76,7 @@ function AnimatedPrompt({ parts, speed = promptAnimationSpeed }) {
               : result.items,
           };
         },
-        { consumedCharacters: 0, items: [] }
+        { consumedCharacters: 0, items: [] as PromptPart[] }
       ).items,
     [parts, visibleLength]
   );
@@ -78,7 +112,7 @@ function AnimatedPrompt({ parts, speed = promptAnimationSpeed }) {
   );
 }
 
-function StaticPrompt({ parts }) {
+function StaticPrompt({ parts }: PromptProps) {
   return (
     <p>
       {parts.map((part) => (
@@ -99,10 +133,10 @@ export default function VerbQuiz({
   onWrong = () => {},
   subject,
   time,
-}) {
+}: VerbQuizProps) {
   const [typedAnswer, setTypedAnswer] = useState('');
   const [status, setStatus] = useState('active');
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const promptParts = useMemo(() => getPromptParts({ infinitiveForm, subject, time }), [infinitiveForm, subject, time]);
   const isCorrect = status === 'correct';
   const isWrong = status === 'wrong';
@@ -114,7 +148,7 @@ export default function VerbQuiz({
     }
   }, [autoFocus, isActive]);
 
-  function resolveCorrect() {
+  function resolveCorrect(): void {
     setTypedAnswer(answer);
     setStatus('correct');
     onCorrect({
@@ -126,7 +160,7 @@ export default function VerbQuiz({
     });
   }
 
-  function resolveWrong() {
+  function resolveWrong(): void {
     setStatus('wrong');
     onWrong({
       answer: typedAnswer,
@@ -137,7 +171,7 @@ export default function VerbQuiz({
     });
   }
 
-  function handleAnswerChange(event) {
+  function handleAnswerChange(event: ChangeEvent<HTMLInputElement>): void {
     const value = event.target.value;
 
     setTypedAnswer(value);
@@ -147,7 +181,7 @@ export default function VerbQuiz({
     }
   }
 
-  function handleAnswerKeyDown(event) {
+  function handleAnswerKeyDown(event: KeyboardEvent<HTMLInputElement>): void {
     if (event.key !== 'Enter' || !typedAnswer.trim() || isResolved) {
       return;
     }

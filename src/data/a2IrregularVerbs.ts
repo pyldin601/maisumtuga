@@ -1,4 +1,24 @@
-export const a2VerbSubjects = [
+export type VerbSubject = {
+  full: string;
+  short: string;
+};
+
+export type VerbForm = {
+  form: string;
+  subjectFull: string;
+  subjectShort: string;
+};
+
+export type VerbTime = 'presente' | 'pps';
+
+export type A2Verb = {
+  infinitive: string;
+  notes?: string;
+  times: Record<VerbTime, VerbForm[]>;
+  translations: string[];
+};
+
+export const a2VerbSubjects: VerbSubject[] = [
   { full: 'eu', short: 'eu' },
   { full: 'tu', short: 'tu' },
   { full: 'você/ele/ela', short: 'voce' },
@@ -6,7 +26,7 @@ export const a2VerbSubjects = [
   { full: 'vocês/eles/elas', short: 'voces' },
 ];
 
-function forms(values) {
+function forms(values: string[]): VerbForm[] {
   return a2VerbSubjects.map((subject, index) => ({
     form: values[index],
     subjectFull: subject.full,
@@ -14,7 +34,7 @@ function forms(values) {
   }));
 }
 
-export const a2Verbs = [
+export const a2Verbs: A2Verb[] = [
   {
     infinitive: 'ser',
     translations: ['to be'],

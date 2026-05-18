@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 import VerbQuiz from './components/quiz/VerbQuiz';
 import { a2Verbs } from './data/a2IrregularVerbs';
-import { LeitnerState } from './state.js';
+import { LeitnerState } from './state';
 
 const nextQuizDelay = 250;
 const quizStream = a2Verbs.flatMap((verb) =>
@@ -17,7 +17,17 @@ const quizStream = a2Verbs.flatMap((verb) =>
   )
 );
 
-function createStreamRow(answerIndex = 0) {
+type StreamRow = {
+  answerIndex: number;
+  id: string;
+  resolved: boolean;
+};
+
+type RowStyle = CSSProperties & {
+  '--row-offset': number;
+};
+
+function createStreamRow(answerIndex = 0): StreamRow {
   return {
     answerIndex,
     id: crypto.randomUUID(),
@@ -30,15 +40,17 @@ const quizzes = quizStream.filter((quiz) => state.isItemDue(quiz));
 
 export default function App() {
   const [rows, setRows] = useState(() => [createStreamRow()]);
-  const nextQuizTimeoutRef = useRef(null);
+  const nextQuizTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(nextQuizTimeoutRef.current);
+      if (nextQuizTimeoutRef.current) {
+        window.clearTimeout(nextQuizTimeoutRef.current);
+      }
     };
   }, []);
 
-  function handleResolved(rowId) {
+  function handleResolved(rowId: string): void {
     setRows((currentRows) => currentRows.map((row) => (row.id === rowId ? { ...row, resolved: true } : row)));
 
     nextQuizTimeoutRef.current = window.setTimeout(() => {
@@ -60,7 +72,7 @@ export default function App() {
     }, nextQuizDelay);
   }
 
-  function handleCorrect(rowId) {
+  function handleCorrect(rowId: string): void {
     const row = rows.find((item) => item.id === rowId);
     if (row) {
       const item = quizzes[row.answerIndex];
@@ -69,7 +81,7 @@ export default function App() {
     handleResolved(rowId);
   }
 
-  function handleWrong(rowId) {
+  function handleWrong(rowId: string): void {
     const row = rows.find((item) => item.id === rowId);
     if (row) {
       const item = quizzes[row.answerIndex];
@@ -90,9 +102,11 @@ export default function App() {
             <section
               className={isHistory ? 'quiz quiz--history' : 'quiz quiz--active'}
               key={row.id}
-              style={{
-                '--row-offset': index - rows.length + 1,
-              }}
+              style={
+                {
+                  '--row-offset': index - rows.length + 1,
+                } as RowStyle
+              }
             >
               <VerbQuiz
                 answer={currentQuiz.answer}

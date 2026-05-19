@@ -8,7 +8,7 @@ import { type VerbQuizSessionQuestion, useVerbQuizSession } from './useVerbQuizS
 
 const nextQuizDelay = 250;
 const sessionQuestionLimit = 60;
-const a2SessionVerbs = [...a2IrregularVerbs, ...a2RegularVerbs];
+const a2SessionVerbs = [...a2RegularVerbs, ...a2IrregularVerbs];
 const quizStream: readonly VerbQuizSessionQuestion[] = a2SessionVerbs.flatMap((verb) =>
   Object.entries(verb.times).flatMap(([timeShortName, forms]) =>
     forms.map((form) => ({
@@ -17,6 +17,7 @@ const quizStream: readonly VerbQuizSessionQuestion[] = a2SessionVerbs.flatMap((v
       subjectFull: form.subjectFull,
       subjectShort: form.subjectShort,
       time: a2VerbTimes[timeShortName as VerbTimeShortName],
+      translations: verb.translations,
     }))
   )
 );
@@ -101,9 +102,11 @@ export default function VerbQuizSession() {
               isActive={isActive}
               onCorrect={(result) => handleCorrect(item.answer.answerId, result.answer)}
               onWrong={(result) => handleWrong(item.answer.answerId, result.answer)}
+              showHints={!isHistory}
               subject={item.question.subjectFull}
               time={item.question.time.fullName}
               timeShortName={item.question.time.shortName}
+              translations={item.question.translations}
             />
           </section>
         );

@@ -9,6 +9,7 @@ export type VerbQuizSessionQuestion = {
   readonly subjectFull: string;
   readonly subjectShort: string;
   readonly time: VerbTime;
+  readonly translations: readonly string[];
 };
 
 export type VerbQuizSessionAnswer = {

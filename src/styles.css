@@ -89,6 +89,42 @@ body {
   color: var(--white-faint);
 }
 
+.prompt-part--hint {
+  position: relative;
+  text-decoration-color: var(--white-faint);
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.prompt-part--hint::after {
+  position: absolute;
+  bottom: calc(100% + 0.45rem);
+  left: 50%;
+  z-index: 1;
+  border: 1px solid rgba(244, 241, 232, 0.16);
+  border-radius: 999px;
+  padding: 0.22rem 0.55rem;
+  color: var(--white-strong);
+  background: rgba(17, 16, 13, 0.92);
+  box-shadow: 0 0.45rem 1.4rem rgba(0, 0, 0, 0.28);
+  content: attr(data-hint);
+  font-size: 0.78em;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 0.2rem);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.prompt-part--hint:hover::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .tense-label {
   color: var(--white-strong);
 }

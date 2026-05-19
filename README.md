@@ -14,7 +14,7 @@ npm run build
 
 ## Practice Scope
 
-The current verb deck focuses on A2 irregular or commonly irregular Portuguese verbs in:
+The current verb deck focuses on A2 Portuguese verbs in:
 
 - `presente`
 - `P.P.S. - Pretérito Perfeito Simples`
@@ -28,6 +28,49 @@ Subjects used:
 - `vocês/eles/elas`
 
 ## Verbs
+
+Verb data is split by kind:
+
+- `src/data/a2RegularVerbs.ts` contains regular verbs, statically ordered by common A2 usage.
+- `src/data/a2IrregularVerbs.ts` contains irregular or commonly irregular verbs.
+
+The quiz merges those files without runtime sorting. Regular verbs are placed first so their source order controls the opening session flow.
+
+### Regular
+
+- `falar` - to speak
+- `trabalhar` - to work
+- `estudar` - to study
+- `morar` - to live
+- `viver` - to live
+- `comprar` - to buy
+- `tomar` - to take, to drink
+- `comer` - to eat
+- `beber` - to drink
+- `passar` - to pass, to spend time
+- `deixar` - to leave, to let
+- `esperar` - to wait, to hope
+- `entrar` - to enter
+- `usar` - to use
+- `ajudar` - to help
+- `aprender` - to learn
+- `procurar` - to look for
+- `receber` - to receive
+- `responder` - to answer
+- `telefonar` - to phone
+- `visitar` - to visit
+- `jantar` - to have dinner
+- `abrir` - to open
+- `assistir` - to watch, to attend
+- `decidir` - to decide
+- `partir` - to leave, to depart
+- `permitir` - to allow
+- `vender` - to sell
+- `existir` - to exist
+- `discutir` - to discuss
+- `dividir` - to divide, to share
+
+### Irregular
 
 - `ser` - to be
 - `estar` - to be

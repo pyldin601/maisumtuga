@@ -1,13 +1,15 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
-import { a2Verbs, a2VerbTimes, type VerbTimeShortName } from '../../../data/a2IrregularVerbs';
+import { a2Verbs as a2IrregularVerbs, a2VerbTimes, type VerbTimeShortName } from '../../../data/a2IrregularVerbs';
+import { a2RegularVerbs } from '../../../data/a2RegularVerbs';
 import { LeitnerState } from '../../../state';
 import VerbQuiz from '../VerbQuiz';
 import { type VerbQuizSessionQuestion, useVerbQuizSession } from './useVerbQuizSession';
 
 const nextQuizDelay = 250;
 const sessionQuestionLimit = 60;
-const quizStream: readonly VerbQuizSessionQuestion[] = a2Verbs.flatMap((verb) =>
+const a2SessionVerbs = [...a2RegularVerbs, ...a2IrregularVerbs];
+const quizStream: readonly VerbQuizSessionQuestion[] = a2SessionVerbs.flatMap((verb) =>
   Object.entries(verb.times).flatMap(([timeShortName, forms]) =>
     forms.map((form) => ({
       correctAnswer: form.form,

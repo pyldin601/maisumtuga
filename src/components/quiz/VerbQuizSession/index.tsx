@@ -8,7 +8,7 @@ import { type VerbQuizSessionQuestion, useVerbQuizSession } from './useVerbQuizS
 
 const nextQuizDelay = 250;
 const sessionQuestionLimit = 60;
-const a2SessionVerbs = [...a2RegularVerbs, ...a2IrregularVerbs];
+const a2SessionVerbs = [...a2IrregularVerbs, ...a2RegularVerbs];
 const quizStream: readonly VerbQuizSessionQuestion[] = a2SessionVerbs.flatMap((verb) =>
   Object.entries(verb.times).flatMap(([timeShortName, forms]) =>
     forms.map((form) => ({

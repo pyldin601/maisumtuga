@@ -6,7 +6,7 @@ import VerbQuiz from '../VerbQuiz';
 import { type VerbQuizSessionQuestion, useVerbQuizSession } from './useVerbQuizSession';
 
 const nextQuizDelay = 250;
-const sessionQuestionLimit = 5;
+const sessionQuestionLimit = 60;
 const quizStream: readonly VerbQuizSessionQuestion[] = a2Verbs.flatMap((verb) =>
   Object.entries(verb.times).flatMap(([time, forms]) =>
     forms.map((form) => ({
@@ -116,9 +116,9 @@ export default function VerbQuizSession() {
             } as RowStyle
           }
         >
-          <p>session closed</p>
+          <p>por agora, está feito</p>
           <button type="button" onClick={handleContinue}>
-            continue
+            continuar
           </button>
         </section>
       )}

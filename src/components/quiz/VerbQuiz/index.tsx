@@ -222,8 +222,8 @@ export default function VerbQuiz({
           <input
             autoComplete="off"
             autoFocus={autoFocus}
-            disabled={!isActive || isResolved}
             inputMode="text"
+            readOnly={!isActive || isResolved}
             ref={inputRef}
             spellCheck="false"
             type="text"

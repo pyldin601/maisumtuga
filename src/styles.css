@@ -133,7 +133,7 @@ body {
   background: transparent;
 }
 
-.quiz__answer input:disabled {
+.quiz__answer input:read-only {
   -webkit-text-fill-color: transparent;
   opacity: 1;
 }

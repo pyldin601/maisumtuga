@@ -1,6 +1,6 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
-import { a2Verbs } from '../../../data/a2IrregularVerbs';
+import { a2Verbs, a2VerbTimes, type VerbTimeShortName } from '../../../data/a2IrregularVerbs';
 import { LeitnerState } from '../../../state';
 import VerbQuiz from '../VerbQuiz';
 import { type VerbQuizSessionQuestion, useVerbQuizSession } from './useVerbQuizSession';
@@ -8,13 +8,13 @@ import { type VerbQuizSessionQuestion, useVerbQuizSession } from './useVerbQuizS
 const nextQuizDelay = 250;
 const sessionQuestionLimit = 60;
 const quizStream: readonly VerbQuizSessionQuestion[] = a2Verbs.flatMap((verb) =>
-  Object.entries(verb.times).flatMap(([time, forms]) =>
+  Object.entries(verb.times).flatMap(([timeShortName, forms]) =>
     forms.map((form) => ({
       correctAnswer: form.form,
       infinitiveForm: verb.infinitive,
       subjectFull: form.subjectFull,
       subjectShort: form.subjectShort,
-      time,
+      time: a2VerbTimes[timeShortName as VerbTimeShortName],
     }))
   )
 );
@@ -100,7 +100,8 @@ export default function VerbQuizSession() {
               onCorrect={(result) => handleCorrect(item.answer.answerId, result.answer)}
               onWrong={(result) => handleWrong(item.answer.answerId, result.answer)}
               subject={item.question.subjectFull}
-              time={item.question.time}
+              time={item.question.time.fullName}
+              timeShortName={item.question.time.shortName}
             />
           </section>
         );

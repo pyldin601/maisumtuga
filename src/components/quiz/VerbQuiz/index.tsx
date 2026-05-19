@@ -1,9 +1,12 @@
 import { type ChangeEvent, type KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 
+import type { VerbTimeShortName } from '../../../data/a2IrregularVerbs';
+
 const promptAnimationSpeed = 22.5;
 
 type PromptPart = {
+  className?: string;
   muted?: boolean;
   text: string;
 };
@@ -33,17 +36,24 @@ type VerbQuizProps = {
   onWrong?: (result: QuizResult) => void;
   subject: string;
   time: string;
+  timeShortName: VerbTimeShortName;
 };
 
-type PromptInput = Pick<VerbQuizProps, 'infinitiveForm' | 'subject' | 'time'>;
+type PromptInput = Pick<VerbQuizProps, 'infinitiveForm' | 'subject' | 'time' | 'timeShortName'>;
 
-function getPromptParts({ infinitiveForm, subject, time }: PromptInput): PromptPart[] {
+function getPromptPartClassName(part: PromptPart): string | undefined {
+  return classNames(part.className, {
+    muted: part.muted,
+  });
+}
+
+function getPromptParts({ infinitiveForm, subject, time, timeShortName }: PromptInput): PromptPart[] {
   return [
     { text: `${subject} ` },
     { text: '+', muted: true },
     { text: ` ${infinitiveForm} ` },
     { text: '/', muted: true },
-    { text: ` ${time}` },
+    { className: `tense-label tense-label--${timeShortName}`, text: ` ${time}` },
   ];
 }
 
@@ -70,6 +80,7 @@ function AnimatedPrompt({ parts, speed = promptAnimationSpeed }: AnimatedPromptP
             consumedCharacters: result.consumedCharacters + part.text.length,
             items: visibleText
               ? result.items.concat({
+                  className: part.className,
                   muted: part.muted,
                   text: visibleText,
                 })
@@ -103,7 +114,7 @@ function AnimatedPrompt({ parts, speed = promptAnimationSpeed }: AnimatedPromptP
   return (
     <p aria-label={text}>
       {visibleParts.map((part, index) => (
-        <span className={part.muted ? 'muted' : undefined} key={index}>
+        <span className={getPromptPartClassName(part)} key={index}>
           {part.text}
         </span>
       ))}
@@ -116,7 +127,7 @@ function StaticPrompt({ parts }: PromptProps) {
   return (
     <p>
       {parts.map((part) => (
-        <span className={part.muted ? 'muted' : undefined} key={part.text}>
+        <span className={getPromptPartClassName(part)} key={part.text}>
           {part.text}
         </span>
       ))}
@@ -133,11 +144,15 @@ export default function VerbQuiz({
   onWrong = () => {},
   subject,
   time,
+  timeShortName,
 }: VerbQuizProps) {
   const [typedAnswer, setTypedAnswer] = useState('');
   const [status, setStatus] = useState('active');
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const promptParts = useMemo(() => getPromptParts({ infinitiveForm, subject, time }), [infinitiveForm, subject, time]);
+  const promptParts = useMemo(
+    () => getPromptParts({ infinitiveForm, subject, time, timeShortName }),
+    [infinitiveForm, subject, time, timeShortName]
+  );
   const isCorrect = status === 'correct';
   const isWrong = status === 'wrong';
   const isResolved = isCorrect || isWrong;

@@ -9,12 +9,17 @@ export type VerbForm = {
   subjectShort: string;
 };
 
-export type VerbTime = 'presente' | 'pps';
+export type VerbTimeShortName = 'presente' | 'pps';
+
+export type VerbTime = {
+  fullName: string;
+  shortName: VerbTimeShortName;
+};
 
 export type A2Verb = {
   infinitive: string;
   notes?: string;
-  times: Record<VerbTime, VerbForm[]>;
+  times: Record<VerbTimeShortName, VerbForm[]>;
   translations: string[];
 };
 
@@ -25,6 +30,17 @@ export const a2VerbSubjects: VerbSubject[] = [
   { full: 'nós', short: 'nos' },
   { full: 'vocês/eles/elas', short: 'voces' },
 ];
+
+export const a2VerbTimes: Record<VerbTimeShortName, VerbTime> = {
+  presente: {
+    fullName: 'presente',
+    shortName: 'presente',
+  },
+  pps: {
+    fullName: 'p.p.s.',
+    shortName: 'pps',
+  },
+};
 
 function forms(values: string[]): VerbForm[] {
   return a2VerbSubjects.map((subject, index) => ({

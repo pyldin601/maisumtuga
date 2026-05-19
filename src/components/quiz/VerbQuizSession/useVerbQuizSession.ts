@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import type { VerbTime } from '../../../data/a2IrregularVerbs';
 import { createAnswer, createInitialAnswers, getIsSessionClosed, getSessionItems } from './useVerbQuizSession.helpers';
 
 export type VerbQuizSessionQuestion = {
@@ -7,7 +8,7 @@ export type VerbQuizSessionQuestion = {
   readonly infinitiveForm: string;
   readonly subjectFull: string;
   readonly subjectShort: string;
-  readonly time: string;
+  readonly time: VerbTime;
 };
 
 export type VerbQuizSessionAnswer = {

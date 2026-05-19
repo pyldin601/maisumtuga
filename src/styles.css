@@ -6,6 +6,9 @@
   --white-faint: rgba(244, 241, 232, 0.36);
   --green: #73d68a;
   --red: #e2776f;
+  --tense-futuro: #79c99a;
+  --tense-pps: #88b7df;
+  --tense-presente: #dfaa67;
 
   color: var(--white);
   background: var(--black);
@@ -84,6 +87,22 @@ body {
 
 .muted {
   color: var(--white-faint);
+}
+
+.tense-label {
+  color: var(--white-strong);
+}
+
+.tense-label--presente {
+  color: var(--tense-presente);
+}
+
+.tense-label--pps {
+  color: var(--tense-pps);
+}
+
+.tense-label--futuro {
+  color: var(--tense-futuro);
 }
 
 .typing-caret {

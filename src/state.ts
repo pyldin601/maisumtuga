@@ -3,7 +3,9 @@ const PROGRESS_KEY = 'leitner-progress';
 type QuizItem = {
   infinitiveForm: string;
   subjectShort: string;
-  time: string;
+  time: {
+    shortName: string;
+  };
 };
 
 type WordProgress = {
@@ -14,7 +16,7 @@ type WordProgress = {
 type Progress = Record<string, WordProgress>;
 
 export function getKey(item: QuizItem): string {
-  return `${item.infinitiveForm}-${item.time}-${item.subjectShort}`;
+  return `${item.infinitiveForm}-${item.time.shortName}-${item.subjectShort}`;
 }
 
 export class LeitnerState {

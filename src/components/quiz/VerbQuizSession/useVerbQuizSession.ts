@@ -28,6 +28,7 @@ interface VerbQuizSessionStore {
   continueSession(newQuestions: readonly VerbQuizSessionQuestion[]): void;
   resolveCorrectQuestion(answerId: string, typedAnswer: string): void;
   resolveWrongQuestion(answerId: string, typedAnswer: string): void;
+  showNextQuestion(): void;
 }
 
 export function useVerbQuizSession(initialQuestions: readonly VerbQuizSessionQuestion[]): VerbQuizSessionStore {
@@ -55,18 +56,31 @@ export function useVerbQuizSession(initialQuestions: readonly VerbQuizSessionQue
         return currentAnswers;
       }
 
-      const nextQuestionIndex = answer.questionIndex + 1;
-      const hasNextQuestion = nextQuestionIndex < questions.length;
-
-      const nextAnswers = currentAnswers.map((currentAnswer, currentAnswerIndex) => {
+      return currentAnswers.map((currentAnswer, currentAnswerIndex) => {
         if (currentAnswerIndex === answerIndex) {
           return { ...currentAnswer, answerStatus, typedAnswer };
         }
 
         return currentAnswer;
       });
+    });
+  }
 
-      return hasNextQuestion ? nextAnswers.concat(createAnswer(nextQuestionIndex)) : nextAnswers;
+  function showNextQuestion(): void {
+    setAnswers((currentAnswers) => {
+      const lastAnswer = currentAnswers.at(-1);
+
+      if (!lastAnswer || lastAnswer.answerStatus === 'pending') {
+        return currentAnswers;
+      }
+
+      const nextQuestionIndex = lastAnswer.questionIndex + 1;
+
+      if (nextQuestionIndex >= questions.length) {
+        return currentAnswers;
+      }
+
+      return currentAnswers.concat(createAnswer(nextQuestionIndex));
     });
   }
 
@@ -83,5 +97,6 @@ export function useVerbQuizSession(initialQuestions: readonly VerbQuizSessionQue
     resolveWrongQuestion(answerId: string, typedAnswer: string): void {
       resolveQuestion(answerId, typedAnswer, 'wrong');
     },
+    showNextQuestion,
   };
 }

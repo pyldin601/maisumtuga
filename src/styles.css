@@ -176,6 +176,40 @@ body {
   color: var(--green);
 }
 
+.session-closed {
+  gap: 1rem;
+}
+
+.session-closed p {
+  margin: 0;
+  color: var(--white-muted);
+  font:
+    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 'SFMono-Regular',
+    Consolas,
+    'Liberation Mono',
+    monospace;
+}
+
+.session-closed button {
+  width: fit-content;
+  border: 0;
+  padding: 0;
+  color: var(--white-faint);
+  background: transparent;
+  cursor: pointer;
+  font:
+    400 clamp(0.92rem, 3vw, 1.35rem) / 1.4 'SFMono-Regular',
+    Consolas,
+    'Liberation Mono',
+    monospace;
+}
+
+.session-closed button:focus-visible,
+.session-closed button:hover {
+  color: var(--white-strong);
+  outline: none;
+}
+
 .sr-only {
   width: 1px;
   height: 1px;

@@ -69,11 +69,10 @@ export class LeitnerState {
 
   moveItemToFirstBox(item: QuizItem): void {
     const key = getKey(item);
-    const nextBox = 1;
-    const nextDue = new Date();
-    nextDue.setHours(0, 0, 0, 0);
 
-    this.progress[key] = { box: nextBox, due: nextDue.getTime() };
+    // it hits the first box by default
+    delete this.progress[key];
+
     this.save();
   }
 

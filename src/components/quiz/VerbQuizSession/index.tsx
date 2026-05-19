@@ -23,14 +23,13 @@ type RowStyle = CSSProperties & {
   '--row-offset': number;
 };
 
-function createSessionQuestions(): readonly VerbQuizSessionQuestion[] {
-  const state = LeitnerState.fromStorage();
-
+function createSessionQuestions(state: LeitnerState): readonly VerbQuizSessionQuestion[] {
   return quizStream.filter((quiz) => state.isItemDue(quiz)).slice(0, sessionQuestionLimit);
 }
 
 export default function VerbQuizSession() {
-  const [initialQuestions] = useState(createSessionQuestions);
+  const [leitnerState] = useState(() => LeitnerState.fromStorage());
+  const [initialQuestions] = useState(() => createSessionQuestions(leitnerState));
   const { continueSession, isClosed, items, resolveCorrectQuestion, resolveWrongQuestion, showNextQuestion } =
     useVerbQuizSession(initialQuestions);
   const nextQuizTimeoutRef = useRef<number | null>(null);
@@ -53,7 +52,7 @@ export default function VerbQuizSession() {
     const item = items.find((currentItem) => currentItem.answer.answerId === answerId);
 
     if (item) {
-      LeitnerState.fromStorage().moveItemToNextBox(item.question);
+      leitnerState.moveItemToNextBox(item.question);
     }
 
     resolveCorrectQuestion(answerId, typedAnswer);
@@ -64,7 +63,7 @@ export default function VerbQuizSession() {
     const item = items.find((currentItem) => currentItem.answer.answerId === answerId);
 
     if (item) {
-      LeitnerState.fromStorage().moveItemToFirstBox(item.question);
+      leitnerState.moveItemToFirstBox(item.question);
     }
 
     resolveWrongQuestion(answerId, typedAnswer);
@@ -72,7 +71,7 @@ export default function VerbQuizSession() {
   }
 
   function handleContinue(): void {
-    continueSession(createSessionQuestions());
+    continueSession(createSessionQuestions(leitnerState));
   }
 
   const rowCount = items.length + (isClosed ? 1 : 0);

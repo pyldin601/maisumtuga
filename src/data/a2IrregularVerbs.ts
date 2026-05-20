@@ -358,13 +358,6 @@ export const a2Verbs: Verb[] = [
     pps: withReflexive(['vesti', 'vestiste', 'vestiu', 'vestimos', 'vestiram']),
   }),
   createCustomVerb({
-    infinitive: 'doer',
-    translations: ['to hurt'],
-    notes: 'Mostly used in third person: dói / doem.',
-    presente: ['doo', 'dóis', 'dói', 'doemos', 'doem'],
-    pps: ['doí', 'doeste', 'doeu', 'doemos', 'doeram'],
-  }),
-  createCustomVerb({
     infinitive: 'morrer',
     translations: ['to die'],
     presente: ['morro', 'morres', 'morre', 'morremos', 'morrem'],

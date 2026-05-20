@@ -9,6 +9,8 @@
   --tense-futuro: #79c99a;
   --tense-pps: #88b7df;
   --tense-presente: #dfaa67;
+  --quiz-bottom-offset: clamp(4.5rem, 12vh, 6.5rem);
+  --quiz-row-gap: 11rem;
 
   color: var(--white);
   background: var(--black);
@@ -96,7 +98,7 @@ body {
   left: 0;
   display: grid;
   gap: 1.35rem;
-  transform: translateY(calc(-50% + (var(--row-offset) * 11rem)));
+  transform: translateY(calc(-50% + (var(--row-offset) * var(--quiz-row-gap))));
   transition:
     opacity 180ms ease,
     transform 240ms ease;
@@ -310,6 +312,19 @@ body {
   .quiz__answer-line--wrong,
   .typing-caret {
     animation: none;
+  }
+}
+
+@media (max-height: 34rem) {
+  .quiz-flow {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 12%, black 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, black 12%, black 100%);
+  }
+
+  .quiz {
+    top: auto;
+    bottom: var(--quiz-bottom-offset);
+    transform: translateY(calc(var(--row-offset) * var(--quiz-row-gap)));
   }
 }
 

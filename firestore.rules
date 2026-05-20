@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isValidVerbReviewSchedule() {
+      return request.resource.data.keys().hasOnly(['items', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['items', 'updatedAt'])
+        && request.resource.data.items is map
+        && request.resource.data.updatedAt is number;
+    }
+
+    match /verbReviewSchedules/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidVerbReviewSchedule();
+      allow delete: if false;
+    }
+  }
+}

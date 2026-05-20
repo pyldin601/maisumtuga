@@ -9,11 +9,12 @@ The product direction is minimal, quiet, and focused. Avoid dashboard-like UI un
 ## Commands
 
 - Run lint: `npm run lint`
+- Run tests: `npm test`
 - Run build: `npm run build`
 - Run dev server: `npm run dev -- --host 127.0.0.1`
 - Format all files: `npm run format`
 
-Run `npm run lint` and `npm run build` after code changes.
+Run `npm test`, `npm run lint`, and `npm run build` after code changes.
 
 ## Architecture Notes
 

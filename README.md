@@ -8,6 +8,7 @@ The quiz shows one conjugation prompt at a time, for example `vocês/eles/elas +
 
 ```sh
 npm run dev -- --host 127.0.0.1
+npm test
 npm run lint
 npm run build
 ```

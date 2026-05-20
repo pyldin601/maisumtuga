@@ -238,13 +238,6 @@ export const a2Verbs: Verb[] = [
     pps: ['trouxe', 'trouxeste', 'trouxe', 'trouxemos', 'trouxeram'],
   }),
   createCustomVerb({
-    infinitive: 'haver',
-    translations: ['there to be', 'to exist'],
-    notes: 'Mostly used impersonally at A2: há / houve.',
-    presente: ['hei', 'hás', 'há', 'havemos', 'hão'],
-    pps: ['houve', 'houveste', 'houve', 'houvemos', 'houveram'],
-  }),
-  createCustomVerb({
     infinitive: 'ler',
     translations: ['to read'],
     presente: ['leio', 'lês', 'lê', 'lemos', 'leem'],

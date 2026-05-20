@@ -1,16 +1,7 @@
 import { useState } from 'react';
 
-import type { VerbTime } from '../../../data/a2IrregularVerbs';
+import type { VerbQuizQuestion } from '../../../data/verbTypes.ts';
 import { createAnswer, createInitialAnswers, getIsSessionClosed, getSessionItems } from './useVerbQuizSession.helpers';
-
-export type VerbQuizSessionQuestion = {
-  readonly correctAnswer: string;
-  readonly infinitiveForm: string;
-  readonly subjectFull: string;
-  readonly subjectShort: string;
-  readonly time: VerbTime;
-  readonly translations: readonly string[];
-};
 
 export type VerbQuizSessionAnswer = {
   readonly answerId: string;
@@ -20,20 +11,20 @@ export type VerbQuizSessionAnswer = {
 };
 
 export type VerbQuizSessionItem = {
-  readonly question: VerbQuizSessionQuestion;
+  readonly question: VerbQuizQuestion;
   readonly answer: VerbQuizSessionAnswer;
 };
 
 interface VerbQuizSessionStore {
   isClosed: boolean;
   items: readonly VerbQuizSessionItem[];
-  continueSession(newQuestions: readonly VerbQuizSessionQuestion[]): void;
+  continueSession(newQuestions: readonly VerbQuizQuestion[]): void;
   resolveCorrectQuestion(answerId: string, typedAnswer: string): void;
   resolveWrongQuestion(answerId: string, typedAnswer: string): void;
   showNextQuestion(): void;
 }
 
-export function useVerbQuizSession(initialQuestions: readonly VerbQuizSessionQuestion[]): VerbQuizSessionStore {
+export function useVerbQuizSession(initialQuestions: readonly VerbQuizQuestion[]): VerbQuizSessionStore {
   const [questions, setQuestions] = useState(initialQuestions);
   const [answers, setAnswers] = useState(() => createInitialAnswers(questions));
 
@@ -89,7 +80,7 @@ export function useVerbQuizSession(initialQuestions: readonly VerbQuizSessionQue
   return {
     isClosed,
     items,
-    continueSession(newQuestions: readonly VerbQuizSessionQuestion[]): void {
+    continueSession(newQuestions: readonly VerbQuizQuestion[]): void {
       setQuestions(newQuestions);
       setAnswers(createInitialAnswers(newQuestions));
     },

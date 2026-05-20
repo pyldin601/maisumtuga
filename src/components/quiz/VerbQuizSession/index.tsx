@@ -1,32 +1,20 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
-import { a2Verbs as a2IrregularVerbs, a2VerbTimes, type VerbTimeShortName } from '../../../data/a2IrregularVerbs';
-import { a2RegularVerbs } from '../../../data/a2RegularVerbs';
-import { LeitnerState } from '../../../state';
 import VerbQuiz from '../VerbQuiz';
-import { type VerbQuizSessionQuestion, useVerbQuizSession } from './useVerbQuizSession';
+import { LeitnerState } from '../../../state';
+import { useVerbQuizSession } from './useVerbQuizSession';
+import { createQuizStream } from '../../../data/quizStream.ts';
+import type { VerbQuizQuestion } from '../../../data/verbTypes.ts';
 
 const nextQuizDelay = 250;
 const sessionQuestionLimit = 60;
-const a2SessionVerbs = [...a2IrregularVerbs, ...a2RegularVerbs];
-const quizStream: readonly VerbQuizSessionQuestion[] = a2SessionVerbs.flatMap((verb) =>
-  Object.entries(verb.times).flatMap(([timeShortName, forms]) =>
-    forms.map((form) => ({
-      correctAnswer: form.form,
-      infinitiveForm: verb.infinitive,
-      subjectFull: form.subjectFull,
-      subjectShort: form.subjectShort,
-      time: a2VerbTimes[timeShortName as VerbTimeShortName],
-      translations: verb.translations,
-    }))
-  )
-);
 
 type RowStyle = CSSProperties & {
   '--row-offset': number;
 };
 
-function createSessionQuestions(state: LeitnerState): readonly VerbQuizSessionQuestion[] {
+function createSessionQuestions(state: LeitnerState): readonly VerbQuizQuestion[] {
+  const quizStream = createQuizStream();
   return quizStream.filter((quiz) => state.isItemDue(quiz)).slice(0, sessionQuestionLimit);
 }
 

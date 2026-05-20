@@ -1,4 +1,5 @@
-import type { VerbQuizSessionAnswer, VerbQuizSessionItem, VerbQuizSessionQuestion } from './useVerbQuizSession';
+import type { VerbQuizQuestion } from '../../../data/verbTypes.ts';
+import type { VerbQuizSessionAnswer, VerbQuizSessionItem } from './useVerbQuizSession';
 
 function createAnswerId(): string {
   return crypto.randomUUID();
@@ -13,12 +14,12 @@ export function createAnswer(questionIndex: number): VerbQuizSessionAnswer {
   };
 }
 
-export function createInitialAnswers(questions: readonly VerbQuizSessionQuestion[]): readonly VerbQuizSessionAnswer[] {
+export function createInitialAnswers(questions: readonly VerbQuizQuestion[]): readonly VerbQuizSessionAnswer[] {
   return questions.length > 0 ? [createAnswer(0)] : [];
 }
 
 export function getIsSessionClosed(
-  questions: readonly VerbQuizSessionQuestion[],
+  questions: readonly VerbQuizQuestion[],
   answers: readonly VerbQuizSessionAnswer[]
 ): boolean {
   const lastAnswer = answers.at(-1);
@@ -30,7 +31,7 @@ export function getIsSessionClosed(
 }
 
 export function getSessionItems(
-  questions: readonly VerbQuizSessionQuestion[],
+  questions: readonly VerbQuizQuestion[],
   answers: readonly VerbQuizSessionAnswer[]
 ): readonly VerbQuizSessionItem[] {
   return answers.map((answer): VerbQuizSessionItem => {

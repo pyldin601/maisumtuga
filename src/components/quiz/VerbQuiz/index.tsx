@@ -1,7 +1,7 @@
 import { type ChangeEvent, type KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 
-import type { VerbTimeShortName } from '../../../data/a2IrregularVerbs';
+import type { VerbTimeShortName } from '../../../data/verbTypes.ts';
 
 const promptAnimationSpeed = 22.5;
 

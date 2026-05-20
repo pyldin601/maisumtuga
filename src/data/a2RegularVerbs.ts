@@ -1,4 +1,5 @@
-import { a2VerbSubjects, type A2Verb, type VerbForm } from './a2IrregularVerbs';
+import { createVerbForms } from './verbSubjects.ts';
+import type { Verb, VerbForm, VerbTimeShortName } from './verbTypes.ts';
 
 type RegularVerbEnding = 'ar' | 'er' | 'ir';
 
@@ -7,7 +8,7 @@ type RegularVerbInput = {
   translations: string[];
 };
 
-const regularEndings: Record<RegularVerbEnding, { presente: string[]; pps: string[] }> = {
+const regularEndings: Record<RegularVerbEnding, Record<VerbTimeShortName, string[]>> = {
   ar: {
     presente: ['o', 'as', 'a', 'amos', 'am'],
     pps: ['ei', 'aste', 'ou', 'ámos', 'aram'],
@@ -56,14 +57,6 @@ const regularVerbInputs: RegularVerbInput[] = [
   { infinitive: 'dividir', translations: ['to divide', 'to share'] },
 ];
 
-function forms(values: string[]): VerbForm[] {
-  return a2VerbSubjects.map((subject, index) => ({
-    form: values[index],
-    subjectFull: subject.full,
-    subjectShort: subject.short,
-  }));
-}
-
 function getRegularVerbEnding(infinitive: string): RegularVerbEnding {
   const ending = infinitive.slice(-2);
 
@@ -78,10 +71,10 @@ function createRegularForms(infinitive: string, time: keyof (typeof regularEndin
   const ending = getRegularVerbEnding(infinitive);
   const stem = infinitive.slice(0, -2);
 
-  return forms(regularEndings[ending][time].map((suffix) => `${stem}${suffix}`));
+  return createVerbForms(regularEndings[ending][time].map((suffix) => `${stem}${suffix}`));
 }
 
-function createRegularVerb({ infinitive, translations }: RegularVerbInput): A2Verb {
+function createRegularVerb({ infinitive, translations }: RegularVerbInput): Verb {
   return {
     infinitive,
     translations,
@@ -92,4 +85,4 @@ function createRegularVerb({ infinitive, translations }: RegularVerbInput): A2Ve
   };
 }
 
-export const a2RegularVerbs: A2Verb[] = regularVerbInputs.map(createRegularVerb);
+export const a2RegularVerbs: Verb[] = regularVerbInputs.map(createRegularVerb);

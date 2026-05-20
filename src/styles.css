@@ -11,6 +11,7 @@
   --tense-presente: #dfaa67;
   --quiz-bottom-offset: clamp(4.5rem, 12vh, 6.5rem);
   --quiz-row-gap: 11rem;
+  --app-height: 100vh;
 
   color: var(--white);
   background: var(--black);
@@ -30,8 +31,10 @@ html,
 body,
 #root {
   min-width: 320px;
-  min-height: 100%;
+  width: 100%;
+  height: var(--app-height);
   margin: 0;
+  overflow: hidden;
 }
 
 html {
@@ -39,13 +42,12 @@ html {
 }
 
 body {
-  min-height: 100vh;
   color: var(--white);
   background: radial-gradient(circle at 50% 0%, rgba(244, 241, 232, 0.07), transparent 31rem), var(--black);
 }
 
 .page {
-  min-height: 100vh;
+  height: var(--app-height);
   position: relative;
   display: grid;
   justify-items: center;
@@ -85,7 +87,7 @@ body {
 
 .quiz-flow {
   width: min(100%, 34rem);
-  min-height: 100vh;
+  height: var(--app-height);
   position: relative;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 25%, black 100%);
   mask-image: linear-gradient(to bottom, transparent 0, black 25%, black 100%);

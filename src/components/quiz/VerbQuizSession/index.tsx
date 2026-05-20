@@ -34,7 +34,18 @@ function getHasStoredItems(schedule: VerbReviewSchedule): boolean {
 }
 
 function getSchedulesHaveSameItems(firstSchedule: VerbReviewSchedule, secondSchedule: VerbReviewSchedule): boolean {
-  return JSON.stringify(firstSchedule.items) === JSON.stringify(secondSchedule.items);
+  const firstEntries = Object.entries(firstSchedule.items);
+  const secondEntries = Object.entries(secondSchedule.items);
+
+  if (firstEntries.length !== secondEntries.length) {
+    return false;
+  }
+
+  return firstEntries.every(([key, firstItem]) => {
+    const secondItem = secondSchedule.items[key];
+
+    return Boolean(secondItem) && firstItem.box === secondItem.box && firstItem.due === secondItem.due;
+  });
 }
 
 function createLeitnerState(userId?: string, schedule = getStoredSchedule()): LeitnerState {

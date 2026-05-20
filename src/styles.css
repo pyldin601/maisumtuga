@@ -51,6 +51,36 @@ body {
   padding-inline: clamp(1rem, 4vw, 2.5rem);
 }
 
+.auth-button {
+  position: fixed;
+  top: clamp(1rem, 3vw, 1.5rem);
+  right: clamp(1rem, 3vw, 1.5rem);
+  z-index: 2;
+  border: 1px solid var(--white-faint);
+  border-radius: 999px;
+  padding: 0.42rem 0.72rem;
+  color: var(--white-muted);
+  background: rgba(17, 16, 13, 0.72);
+  cursor: pointer;
+  font:
+    400 0.84rem / 1.2 'SFMono-Regular',
+    Consolas,
+    'Liberation Mono',
+    monospace;
+}
+
+.auth-button:hover,
+.auth-button:focus-visible {
+  border-color: var(--white-muted);
+  color: var(--white-strong);
+  outline: none;
+}
+
+.auth-button:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
 .quiz-flow {
   width: min(100%, 34rem);
   min-height: 100vh;

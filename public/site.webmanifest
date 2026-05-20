@@ -2,14 +2,14 @@
   "name": "Maisumtuga",
   "short_name": "Maisumtuga",
   "description": "Minimal Portuguese verb conjugation practice.",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/maisumtuga/",
+  "scope": "/maisumtuga/",
   "display": "standalone",
   "background_color": "#11100d",
   "theme_color": "#11100d",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/maisumtuga/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

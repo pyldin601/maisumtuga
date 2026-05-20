@@ -23,8 +23,8 @@ function createCustomVerb({ infinitive, translations, presente, pps, notes }: Cu
   };
 }
 
-function withSuffix(forms: string[], suffix: string): string[] {
-  return forms.map((form) => `${form} ${suffix}`);
+function withSuffix(forms: string[], suffix: string | string[]): string[] {
+  return forms.map((form, index) => `${form} ${Array.isArray(suffix) ? suffix[index] : suffix}`);
 }
 
 function withReflexive(forms: string[]): string[] {
@@ -49,6 +49,9 @@ const porPresente = ['ponho', 'pões', 'põe', 'pomos', 'põem'];
 const porPps = ['pus', 'puseste', 'pôs', 'pusemos', 'puseram'];
 const pedirPresente = ['peço', 'pedes', 'pede', 'pedimos', 'pedem'];
 const pedirPps = ['pedi', 'pediste', 'pediu', 'pedimos', 'pediram'];
+const defaultBomEm = ['bom em', 'bom em', 'bom em', 'bons em', 'bons em'];
+const defaultPerdido = ['perdido', 'perdido', 'perdido', 'perdidos', 'perdidos'];
+const defaultVestido = ['vestido', 'vestido', 'vestido', 'vestidos', 'vestidos'];
 
 export const a2Verbs: Verb[] = [
   createCustomVerb({
@@ -60,9 +63,9 @@ export const a2Verbs: Verb[] = [
   createCustomVerb({
     infinitive: 'ser bom em',
     translations: ['to be good at'],
-    presente: withSuffix(serPresente, 'bom em'),
-    pps: withSuffix(serPps, 'bom em'),
-    notes: 'Uses the masculine singular adjective form in quiz answers.',
+    presente: withSuffix(serPresente, defaultBomEm),
+    pps: withSuffix(serPps, defaultBomEm),
+    notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
     infinitive: 'estar',
@@ -73,16 +76,16 @@ export const a2Verbs: Verb[] = [
   createCustomVerb({
     infinitive: 'estar perdido',
     translations: ['to be lost'],
-    presente: withSuffix(estarPresente, 'perdido'),
-    pps: withSuffix(estarPps, 'perdido'),
-    notes: 'Uses the masculine singular adjective form in quiz answers.',
+    presente: withSuffix(estarPresente, defaultPerdido),
+    pps: withSuffix(estarPps, defaultPerdido),
+    notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
     infinitive: 'estar vestido',
     translations: ['to be dressed'],
-    presente: withSuffix(estarPresente, 'vestido'),
-    pps: withSuffix(estarPps, 'vestido'),
-    notes: 'Uses the masculine singular adjective form in quiz answers.',
+    presente: withSuffix(estarPresente, defaultVestido),
+    pps: withSuffix(estarPps, defaultVestido),
+    notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
     infinitive: 'ter',
@@ -99,8 +102,8 @@ export const a2Verbs: Verb[] = [
   createCustomVerb({
     infinitive: 'ter de/que',
     translations: ['to have to'],
-    presente: withSuffix(terPresente, 'de/que'),
-    pps: withSuffix(terPps, 'de/que'),
+    presente: withSuffix(terPresente, 'de'),
+    pps: withSuffix(terPps, 'de'),
   }),
   createCustomVerb({
     infinitive: 'ter saudades',

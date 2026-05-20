@@ -7,7 +7,7 @@ type RegularVerbInput = {
   infinitive: string;
   translations: string[];
   baseInfinitive?: string;
-  suffix?: string;
+  suffix?: string | string[];
   reflexive?: boolean;
 };
 
@@ -255,14 +255,16 @@ function createRegularFormValues(infinitive: string, time: keyof (typeof regular
 }
 
 function applyVerbInputForm(value: string, input: RegularVerbInput, index: number): string {
+  const suffix = Array.isArray(input.suffix) ? input.suffix[index] : input.suffix;
+
   if (!input.reflexive) {
-    return input.suffix ? `${value} ${input.suffix}` : value;
+    return suffix ? `${value} ${suffix}` : value;
   }
 
   const reflexiveValue =
     index === 3 ? `${value.slice(0, -1)}${reflexivePronouns[index]}` : `${value}${reflexivePronouns[index]}`;
 
-  return input.suffix ? `${reflexiveValue} ${input.suffix}` : reflexiveValue;
+  return suffix ? `${reflexiveValue} ${suffix}` : reflexiveValue;
 }
 
 function createRegularForms(

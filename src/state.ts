@@ -1,4 +1,5 @@
-const PROGRESS_KEY = 'leitner-progress';
+const legacyProgressKey = 'leitner-progress';
+const verbReviewSchedulesKey = 'verbReviewSchedules';
 
 type QuizItem = {
   infinitiveForm: string;
@@ -8,12 +9,51 @@ type QuizItem = {
   };
 };
 
-type WordProgress = {
+export type WordProgress = {
   box: number;
   due: number;
 };
 
-type Progress = Record<string, WordProgress>;
+export type Progress = Record<string, WordProgress>;
+
+export type VerbReviewSchedule = {
+  items: Progress;
+  updatedAt: number;
+};
+
+type ProgressPatch = {
+  key: string;
+  updatedAt: number;
+  value: WordProgress | null;
+};
+
+type SyncProgressPatch = (patch: ProgressPatch) => void;
+
+function parseVerbReviewSchedule(value: string | null): VerbReviewSchedule | null {
+  if (!value) {
+    return null;
+  }
+
+  const parsedValue = JSON.parse(value) as Progress | Partial<VerbReviewSchedule>;
+
+  if (!parsedValue || typeof parsedValue !== 'object') {
+    return null;
+  }
+
+  if ('items' in parsedValue) {
+    const schedule = parsedValue as Partial<VerbReviewSchedule>;
+
+    return {
+      items: schedule.items ?? {},
+      updatedAt: schedule.updatedAt ?? 0,
+    };
+  }
+
+  return {
+    items: parsedValue as Progress,
+    updatedAt: 0,
+  };
+}
 
 export function getKey(item: QuizItem): string {
   return `${item.infinitiveForm}-${item.time.shortName}-${item.subjectShort}`;
@@ -21,20 +61,40 @@ export function getKey(item: QuizItem): string {
 
 export class LeitnerState {
   progress: Progress;
+  updatedAt: number;
+  private readonly syncProgressPatch?: SyncProgressPatch;
 
-  constructor(progress: Progress) {
+  constructor(progress: Progress, syncProgressPatch?: SyncProgressPatch, updatedAt = Date.now()) {
     // key -> { box, due }
     this.progress = progress;
+    this.updatedAt = updatedAt;
+    this.syncProgressPatch = syncProgressPatch;
   }
 
-  static fromStorage(): LeitnerState {
-    const progress = localStorage.getItem(PROGRESS_KEY);
+  static fromStorage(syncProgressPatch?: SyncProgressPatch): LeitnerState {
+    const schedule = LeitnerState.readFromStorage();
 
-    if (!progress) {
-      return new LeitnerState({});
+    if (!schedule) {
+      return new LeitnerState({}, syncProgressPatch);
     }
 
-    return new LeitnerState(JSON.parse(progress));
+    return new LeitnerState(schedule.items, syncProgressPatch, schedule.updatedAt);
+  }
+
+  static readFromStorage(): VerbReviewSchedule | null {
+    return parseVerbReviewSchedule(localStorage.getItem(verbReviewSchedulesKey));
+  }
+
+  static readLegacyFromStorage(): VerbReviewSchedule | null {
+    return parseVerbReviewSchedule(localStorage.getItem(legacyProgressKey));
+  }
+
+  static removeLegacyFromStorage(): void {
+    localStorage.removeItem(legacyProgressKey);
+  }
+
+  static fromProgress(progress: Progress, syncProgressPatch?: SyncProgressPatch, updatedAt = Date.now()): LeitnerState {
+    return new LeitnerState(progress, syncProgressPatch, updatedAt);
   }
 
   moveItemToNextBox(item: QuizItem): void {
@@ -63,8 +123,11 @@ export class LeitnerState {
       default:
     }
 
-    this.progress[key] = { box: nextBox, due: nextDue.getTime() };
+    const nextProgress = { box: nextBox, due: nextDue.getTime() };
+
+    this.progress[key] = nextProgress;
     this.save();
+    this.syncProgressPatch?.({ key, updatedAt: this.updatedAt, value: nextProgress });
   }
 
   moveItemToFirstBox(item: QuizItem): void {
@@ -74,6 +137,7 @@ export class LeitnerState {
     delete this.progress[key];
 
     this.save();
+    this.syncProgressPatch?.({ key, updatedAt: this.updatedAt, value: null });
   }
 
   isItemDue(item: QuizItem): boolean {
@@ -90,6 +154,18 @@ export class LeitnerState {
   }
 
   save(): void {
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify(this.progress));
+    this.updatedAt = Date.now();
+    this.saveWithUpdatedAt(this.updatedAt);
+  }
+
+  saveWithUpdatedAt(updatedAt: number): void {
+    this.updatedAt = updatedAt;
+    localStorage.setItem(
+      verbReviewSchedulesKey,
+      JSON.stringify({
+        items: this.progress,
+        updatedAt: this.updatedAt,
+      })
+    );
   }
 }

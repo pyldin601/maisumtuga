@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAHfSLd-tTb8LZkZBkiZfIFdl3DgkbNsFk',
@@ -14,6 +15,7 @@ const firebaseConfig = {
 
 export const firebaseApp = initializeApp(firebaseConfig);
 export const firebaseAuth = getAuth(firebaseApp);
+export const firebaseDb = getFirestore(firebaseApp);
 export const googleAuthProvider = new GoogleAuthProvider();
 
 export const firebaseAnalytics: Promise<Analytics | null> = isSupported()

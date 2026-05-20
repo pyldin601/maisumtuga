@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type { VerbQuizQuestion } from '../../../data/verbTypes.ts';
 import { createAnswer, createInitialAnswers, getIsSessionClosed, getSessionItems } from './useVerbQuizSession.helpers';
@@ -31,35 +31,34 @@ export function useVerbQuizSession(initialQuestions: readonly VerbQuizQuestion[]
   const items = getSessionItems(questions, answers);
   const isClosed = getIsSessionClosed(questions, answers);
 
-  function resolveQuestion(
-    answerId: string,
-    typedAnswer: string,
-    answerStatus: VerbQuizSessionAnswer['answerStatus']
-  ): void {
-    setAnswers((currentAnswers) => {
-      const answerIndex = currentAnswers.findIndex((answer) => answer.answerId === answerId);
+  const resolveQuestion = useCallback(
+    (answerId: string, typedAnswer: string, answerStatus: VerbQuizSessionAnswer['answerStatus']): void => {
+      setAnswers((currentAnswers) => {
+        const answerIndex = currentAnswers.findIndex((answer) => answer.answerId === answerId);
 
-      if (answerIndex === -1) {
-        return currentAnswers;
-      }
-
-      const answer = currentAnswers.at(answerIndex);
-
-      if (!answer || answer.answerStatus !== 'pending') {
-        return currentAnswers;
-      }
-
-      return currentAnswers.map((currentAnswer, currentAnswerIndex) => {
-        if (currentAnswerIndex === answerIndex) {
-          return { ...currentAnswer, answerStatus, typedAnswer };
+        if (answerIndex === -1) {
+          return currentAnswers;
         }
 
-        return currentAnswer;
-      });
-    });
-  }
+        const answer = currentAnswers.at(answerIndex);
 
-  function showNextQuestion(): void {
+        if (!answer || answer.answerStatus !== 'pending') {
+          return currentAnswers;
+        }
+
+        return currentAnswers.map((currentAnswer, currentAnswerIndex) => {
+          if (currentAnswerIndex === answerIndex) {
+            return { ...currentAnswer, answerStatus, typedAnswer };
+          }
+
+          return currentAnswer;
+        });
+      });
+    },
+    []
+  );
+
+  const showNextQuestion = useCallback((): void => {
     setAnswers((currentAnswers) => {
       const lastAnswer = currentAnswers.at(-1);
 
@@ -75,21 +74,33 @@ export function useVerbQuizSession(initialQuestions: readonly VerbQuizQuestion[]
 
       return currentAnswers.concat(createAnswer(nextQuestionIndex));
     });
-  }
+  }, [questions.length]);
+
+  const continueSession = useCallback((newQuestions: readonly VerbQuizQuestion[]): void => {
+    setQuestions(newQuestions);
+    setAnswers(createInitialAnswers(newQuestions));
+  }, []);
+
+  const resolveCorrectQuestion = useCallback(
+    (answerId: string, typedAnswer: string): void => {
+      resolveQuestion(answerId, typedAnswer, 'correct');
+    },
+    [resolveQuestion]
+  );
+
+  const resolveWrongQuestion = useCallback(
+    (answerId: string, typedAnswer: string): void => {
+      resolveQuestion(answerId, typedAnswer, 'wrong');
+    },
+    [resolveQuestion]
+  );
 
   return {
     isClosed,
     items,
-    continueSession(newQuestions: readonly VerbQuizQuestion[]): void {
-      setQuestions(newQuestions);
-      setAnswers(createInitialAnswers(newQuestions));
-    },
-    resolveCorrectQuestion(answerId: string, typedAnswer: string): void {
-      resolveQuestion(answerId, typedAnswer, 'correct');
-    },
-    resolveWrongQuestion(answerId: string, typedAnswer: string): void {
-      resolveQuestion(answerId, typedAnswer, 'wrong');
-    },
+    continueSession,
+    resolveCorrectQuestion,
+    resolveWrongQuestion,
     showNextQuestion,
   };
 }

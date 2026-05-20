@@ -1,10 +1,17 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
 
 import VerbQuiz from '../VerbQuiz';
-import { LeitnerState } from '../../../state';
+import { LeitnerState, type VerbReviewSchedule } from '../../../state';
 import { useVerbQuizSession } from './useVerbQuizSession';
 import { createQuizStream } from '../../../data/quizStream.ts';
 import type { VerbQuizQuestion } from '../../../data/verbTypes.ts';
+import { firebaseAuth } from '../../../firebase.ts';
+import {
+  loadVerbReviewSchedule,
+  patchVerbReviewScheduleItem,
+  saveVerbReviewSchedule,
+} from '../../../services/verbReviewSchedule.ts';
 
 const nextQuizDelay = 250;
 const sessionQuestionLimit = 60;
@@ -18,15 +25,115 @@ function createSessionQuestions(state: LeitnerState): readonly VerbQuizQuestion[
   return quizStream.filter((quiz) => state.isItemDue(quiz)).slice(0, sessionQuestionLimit);
 }
 
+function getStoredSchedule(): VerbReviewSchedule {
+  return LeitnerState.readFromStorage() ?? { items: {}, updatedAt: 0 };
+}
+
+function getHasStoredItems(schedule: VerbReviewSchedule): boolean {
+  return Object.keys(schedule.items).length > 0;
+}
+
+function getSchedulesHaveSameItems(firstSchedule: VerbReviewSchedule, secondSchedule: VerbReviewSchedule): boolean {
+  return JSON.stringify(firstSchedule.items) === JSON.stringify(secondSchedule.items);
+}
+
+function createLeitnerState(userId?: string, schedule = getStoredSchedule()): LeitnerState {
+  if (!userId) {
+    return LeitnerState.fromProgress(schedule.items, undefined, schedule.updatedAt);
+  }
+
+  return LeitnerState.fromProgress(
+    schedule.items,
+    ({ key, updatedAt, value }) => {
+      void patchVerbReviewScheduleItem(userId, key, updatedAt, value).catch(() => {
+        // Keep local progress authoritative for the current session if remote sync fails.
+      });
+    },
+    schedule.updatedAt
+  );
+}
+
+async function loadUserSchedule(userId: string): Promise<VerbReviewSchedule> {
+  const legacySchedule = LeitnerState.readLegacyFromStorage();
+
+  if (legacySchedule) {
+    await saveVerbReviewSchedule(userId, {
+      items: legacySchedule.items,
+      updatedAt: Date.now(),
+    });
+    LeitnerState.removeLegacyFromStorage();
+  }
+
+  const localSchedule = getStoredSchedule();
+  const remoteSchedule = await loadVerbReviewSchedule(userId);
+
+  if (!remoteSchedule) {
+    if (localSchedule.updatedAt > 0 || getHasStoredItems(localSchedule)) {
+      await saveVerbReviewSchedule(userId, localSchedule);
+    }
+
+    return localSchedule;
+  }
+
+  if (localSchedule.updatedAt > remoteSchedule.updatedAt) {
+    await saveVerbReviewSchedule(userId, localSchedule);
+    return localSchedule;
+  }
+
+  return remoteSchedule;
+}
+
 export default function VerbQuizSession() {
-  const [leitnerState] = useState(() => LeitnerState.fromStorage());
+  const [leitnerState, setLeitnerState] = useState(() => createLeitnerState());
   const [initialQuestions] = useState(() => createSessionQuestions(leitnerState));
   const { continueSession, isClosed, items, resolveCorrectQuestion, resolveWrongQuestion, showNextQuestion } =
     useVerbQuizSession(initialQuestions);
+  const authLoadIdRef = useRef(0);
   const nextQuizTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      const authLoadId = authLoadIdRef.current + 1;
+      authLoadIdRef.current = authLoadId;
+
+      if (!user) {
+        setLeitnerState(createLeitnerState());
+        return;
+      }
+
+      void loadUserSchedule(user.uid)
+        .then((schedule) => {
+          if (authLoadIdRef.current !== authLoadId) {
+            return;
+          }
+
+          const currentSchedule = getStoredSchedule();
+          const nextState = createLeitnerState(user.uid, schedule);
+          nextState.saveWithUpdatedAt(schedule.updatedAt);
+          setLeitnerState(nextState);
+
+          if (!getSchedulesHaveSameItems(currentSchedule, schedule)) {
+            continueSession(createSessionQuestions(nextState));
+          }
+        })
+        .catch(() => {
+          if (authLoadIdRef.current !== authLoadId) {
+            return;
+          }
+
+          setLeitnerState(createLeitnerState(user.uid));
+        });
+    });
+
     return () => {
+      authLoadIdRef.current += 1;
+      unsubscribe();
+    };
+  }, [continueSession]);
+
+  useEffect(() => {
+    return () => {
+      // Prevent pending UI timers from appending questions after unmount.
       if (nextQuizTimeoutRef.current) {
         window.clearTimeout(nextQuizTimeoutRef.current);
       }

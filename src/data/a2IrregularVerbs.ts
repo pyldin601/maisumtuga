@@ -28,7 +28,11 @@ function withSuffix(forms: string[], suffix: string): string[] {
 }
 
 function withReflexive(forms: string[]): string[] {
-  return forms.map((form, index) => `${form}${reflexivePronouns[index]}`);
+  return forms.map((form, index) => {
+    const conjugatedForm = index === 3 ? form.slice(0, -1) : form;
+
+    return `${conjugatedForm}${reflexivePronouns[index]}`;
+  });
 }
 
 const serPresente = ['sou', 'és', 'é', 'somos', 'são'];

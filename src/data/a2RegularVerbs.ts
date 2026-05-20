@@ -255,13 +255,14 @@ function createRegularFormValues(infinitive: string, time: keyof (typeof regular
 }
 
 function applyVerbInputForm(value: string, input: RegularVerbInput, index: number): string {
-  const reflexiveValue = input.reflexive ? `${value}${reflexivePronouns[index]}` : value;
-
-  if (!input.suffix) {
-    return reflexiveValue;
+  if (!input.reflexive) {
+    return input.suffix ? `${value} ${input.suffix}` : value;
   }
 
-  return `${reflexiveValue} ${input.suffix}`;
+  const reflexiveValue =
+    index === 3 ? `${value.slice(0, -1)}${reflexivePronouns[index]}` : `${value}${reflexivePronouns[index]}`;
+
+  return input.suffix ? `${reflexiveValue} ${input.suffix}` : reflexiveValue;
 }
 
 function createRegularForms(

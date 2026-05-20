@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Maisumtuga icon">
+  <rect width="128" height="128" rx="24" fill="#11100d" />
+  <path
+    fill="#f4f1e8"
+    d="M34 39h8l22 29 22-29h8v50h-10V56L66 80h-4L44 56v33H34V39Z"
+  />
+  <path
+    fill="#73d68a"
+    d="M84.7 93.3 73.4 82l5.2-5.2 6.1 6.1 14.7-14.7 5.2 5.2-19.9 19.9Z"
+  />
+</svg>

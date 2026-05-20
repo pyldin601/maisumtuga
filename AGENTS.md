@@ -27,6 +27,10 @@ Run `npm run lint` and `npm run build` after code changes.
 - `useVerbQuizSession` should stay pure session state. Do not put `localStorage` or Leitner persistence in this hook.
 - `VerbQuiz` should stay focused on a single prompt/input interaction.
 - `src/state.ts` owns Leitner storage behavior.
+- Verb data is split by conjugation strategy:
+  - `src/data/a2RegularVerbs.ts` owns regular verbs and regular verb phrases, including `baseInfinitive`, `suffix`, and `reflexive` handling.
+  - `src/data/a2IrregularVerbs.ts` owns irregular verbs, stem-changing verbs, and phrases built from irregular bases.
+- Keep verb phrase generation in the data layer. Do not special-case phrases in quiz components or session hooks.
 
 ## Session Flow
 

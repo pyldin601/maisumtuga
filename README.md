@@ -29,65 +29,21 @@ Subjects used:
 
 ## Verbs
 
-Verb data is split by kind:
+Verb data covers the complete course list for Units 1-36, plus `trazer`, in both supported tenses.
 
-- `src/data/a2RegularVerbs.ts` contains regular verbs, statically ordered by common A2 usage.
-- `src/data/a2IrregularVerbs.ts` contains irregular or commonly irregular verbs.
+Verb data is split by conjugation strategy:
 
-The quiz merges those files without runtime sorting. Regular verbs are placed first so their source order controls the opening session flow.
+- `src/data/a2RegularVerbs.ts` contains regular verbs and regular verb phrases.
+- `src/data/a2IrregularVerbs.ts` contains irregular verbs, stem-changing verbs, and phrases based on irregular verbs.
 
-### Regular
+The quiz merges those files and shuffles the combined deck when building a session.
 
-- `falar` - to speak
-- `trabalhar` - to work
-- `estudar` - to study
-- `morar` - to live
-- `viver` - to live
-- `comprar` - to buy
-- `tomar` - to take, to drink
-- `comer` - to eat
-- `beber` - to drink
-- `passar` - to pass, to spend time
-- `deixar` - to leave, to let
-- `esperar` - to wait, to hope
-- `entrar` - to enter
-- `usar` - to use
-- `ajudar` - to help
-- `aprender` - to learn
-- `procurar` - to look for
-- `receber` - to receive
-- `responder` - to answer
-- `telefonar` - to phone
-- `visitar` - to visit
-- `jantar` - to have dinner
-- `abrir` - to open
-- `assistir` - to watch, to attend
-- `decidir` - to decide
-- `partir` - to leave, to depart
-- `permitir` - to allow
-- `vender` - to sell
-- `existir` - to exist
-- `discutir` - to discuss
-- `dividir` - to divide, to share
+Regular verb inputs support:
 
-### Irregular
+- `baseInfinitive` for phrases that conjugate a shorter base verb, such as `andar de`.
+- `suffix` for fixed phrase text appended after the conjugated form, such as `a cavalo`.
+- `reflexive` for hyphenated reflexive pronouns, such as `chamo-me`.
 
-- `ser` - to be
-- `estar` - to be
-- `ter` - to have
-- `ir` - to go
-- `fazer` - to do, to make
-- `dizer` - to say, to tell
-- `poder` - can, to be able to
-- `querer` - to want
-- `saber` - to know
-- `ver` - to see
-- `vir` - to come
-- `dar` - to give
-- `pôr` - to put
-- `cair` - to fall
-- `trazer` - to bring
-- `haver` - there to be, to exist
-- `ler` - to read
-- `ouvir` - to hear, to listen
-- `pedir` - to ask for, to order
+The regular generator also handles common spelling changes in the first-person singular preterite and present where needed, including `-çar`, `-car`, `-gar`, `-ear`, and `-cer`.
+
+Some adjective phrases use a fixed masculine singular quiz answer, for example `estar perdido` and `ser bom em`.

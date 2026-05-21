@@ -1,5 +1,8 @@
 const legacyProgressKey = 'leitner-progress';
 const verbReviewSchedulesKey = 'verbReviewSchedules';
+const quizVerbTypeKey = 'quizVerbType';
+
+export type QuizVerbType = 'regular' | 'irregular' | 'both';
 
 type QuizItem = {
   infinitiveForm: string;
@@ -20,6 +23,20 @@ export type VerbReviewSchedule = {
   items: Progress;
   updatedAt: number;
 };
+
+export function readQuizVerbType(): QuizVerbType {
+  const storedVerbType = localStorage.getItem(quizVerbTypeKey);
+
+  if (storedVerbType === 'regular' || storedVerbType === 'irregular' || storedVerbType === 'both') {
+    return storedVerbType;
+  }
+
+  return 'both';
+}
+
+export function writeQuizVerbType(verbType: QuizVerbType): void {
+  localStorage.setItem(quizVerbTypeKey, verbType);
+}
 
 type ProgressPatch = {
   key: string;

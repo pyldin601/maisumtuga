@@ -30,6 +30,7 @@ type QuizResult = {
 
 type VerbQuizProps = {
   answer: string;
+  acceptedAnswers?: readonly string[];
   autoFocus?: boolean;
   infinitiveForm: string;
   isActive?: boolean;
@@ -81,6 +82,12 @@ function normalizeAnswer(value: string): string {
     .toLocaleLowerCase('pt-PT')
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '');
+}
+
+function isAcceptedAnswer(value: string, acceptedAnswers: readonly string[]): boolean {
+  const normalizedValue = normalizeAnswer(value);
+
+  return acceptedAnswers.some((acceptedAnswer) => normalizeAnswer(acceptedAnswer) === normalizedValue);
 }
 
 function AnimatedPrompt({ parts, speed = promptAnimationSpeed }: AnimatedPromptProps) {
@@ -156,6 +163,7 @@ function StaticPrompt({ parts }: PromptProps) {
 
 export default function VerbQuiz({
   answer,
+  acceptedAnswers = [answer],
   autoFocus = false,
   infinitiveForm,
   isActive = true,
@@ -184,11 +192,11 @@ export default function VerbQuiz({
     }
   }, [autoFocus, isActive]);
 
-  function resolveCorrect(): void {
-    setTypedAnswer(answer);
+  function resolveCorrect(typedAnswer: string): void {
+    setTypedAnswer(typedAnswer);
     setStatus('correct');
     onCorrect({
-      answer,
+      answer: typedAnswer,
       expectedAnswer: answer,
       infinitiveForm,
       subject,
@@ -212,8 +220,8 @@ export default function VerbQuiz({
 
     setTypedAnswer(value);
 
-    if (normalizeAnswer(value) === normalizeAnswer(answer)) {
-      resolveCorrect();
+    if (isAcceptedAnswer(value, acceptedAnswers)) {
+      resolveCorrect(value);
     }
   }
 

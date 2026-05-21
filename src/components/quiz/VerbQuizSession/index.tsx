@@ -222,6 +222,7 @@ export default function VerbQuizSession({ quizVerbType }: VerbQuizSessionProps) 
             }
           >
             <VerbQuiz
+              acceptedAnswers={item.question.acceptedAnswers}
               answer={item.question.correctAnswer}
               autoFocus={isActive}
               infinitiveForm={item.question.infinitiveForm}

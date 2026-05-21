@@ -4,6 +4,8 @@ import type { Verb } from './verbTypes.ts';
 const reflexivePronouns = ['-me', '-te', '-se', '-nos', '-se'];
 
 type CustomVerbInput = {
+  acceptedPps?: string[];
+  acceptedPresente?: string[];
   infinitive: string;
   translations: string[];
   presente: string[];
@@ -11,14 +13,36 @@ type CustomVerbInput = {
   notes?: string;
 };
 
-function createCustomVerb({ infinitive, translations, presente, pps, notes }: CustomVerbInput): Verb {
+function addAcceptedAnswers(
+  forms: ReturnType<typeof createVerbForms>,
+  acceptedAnswers?: string[]
+): ReturnType<typeof createVerbForms> {
+  if (!acceptedAnswers) {
+    return forms;
+  }
+
+  return forms.map((form, index) => ({
+    ...form,
+    acceptedAnswers: acceptedAnswers[index] ? [acceptedAnswers[index]] : [],
+  }));
+}
+
+function createCustomVerb({
+  acceptedPps,
+  acceptedPresente,
+  infinitive,
+  translations,
+  presente,
+  pps,
+  notes,
+}: CustomVerbInput): Verb {
   return {
     infinitive,
     translations,
     notes,
     times: {
-      presente: createVerbForms(presente),
-      pps: createVerbForms(pps),
+      presente: addAcceptedAnswers(createVerbForms(presente), acceptedPresente),
+      pps: addAcceptedAnswers(createVerbForms(pps), acceptedPps),
     },
   };
 }
@@ -41,6 +65,10 @@ const estarPresente = ['estou', 'estás', 'está', 'estamos', 'estão'];
 const estarPps = ['estive', 'estiveste', 'esteve', 'estivemos', 'estiveram'];
 const terPresente = ['tenho', 'tens', 'tem', 'temos', 'têm'];
 const terPps = ['tive', 'tiveste', 'teve', 'tivemos', 'tiveram'];
+const terDePresente = withSuffix(terPresente, 'de');
+const terDePps = withSuffix(terPps, 'de');
+const terQuePresente = withSuffix(terPresente, 'que');
+const terQuePps = withSuffix(terPps, 'que');
 const irPresente = ['vou', 'vais', 'vai', 'vamos', 'vão'];
 const irPps = serPps;
 const fazerPresente = ['faço', 'fazes', 'faz', 'fazemos', 'fazem'];
@@ -102,8 +130,10 @@ export const a2Verbs: Verb[] = [
   createCustomVerb({
     infinitive: 'ter de/que',
     translations: ['to have to'],
-    presente: withSuffix(terPresente, 'de'),
-    pps: withSuffix(terPps, 'de'),
+    presente: terDePresente,
+    pps: terDePps,
+    acceptedPresente: terQuePresente,
+    acceptedPps: terQuePps,
   }),
   createCustomVerb({
     infinitive: 'ter saudades',

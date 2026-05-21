@@ -27,6 +27,26 @@ function getForms(infinitive: string, time: VerbTimeShortName): string[] {
   });
 }
 
+function getAcceptedForms(infinitive: string, time: VerbTimeShortName): string[][] {
+  const verb = verbsByInfinitive.get(infinitive) as Verb | undefined;
+
+  if (!verb) {
+    throw new Error(`Missing verb fixture: ${infinitive}`);
+  }
+
+  const formsBySubject = new Map(verb.times[time].map((form) => [form.subjectShort, form]));
+
+  return subjects.map((subject) => {
+    const form = formsBySubject.get(subject);
+
+    if (!form) {
+      throw new Error(`Missing ${time} form for ${infinitive} / ${subject}`);
+    }
+
+    return [form.form, ...(form.acceptedAnswers ?? [])];
+  });
+}
+
 const presenteCases = [
   { infinitive: 'abrir', expected: ['abro', 'abres', 'abre', 'abrimos', 'abrem'] },
   { infinitive: 'acabar', expected: ['acabo', 'acabas', 'acaba', 'acabamos', 'acabam'] },
@@ -597,5 +617,22 @@ describe('Portuguese verb form generation', () => {
 
   test.each(ppsCases)('generates P.P.S. forms for $infinitive', ({ infinitive, expected }) => {
     expect(getForms(infinitive, 'pps')).toEqual(expected);
+  });
+
+  test('accepts ter que as an alternative for ter de/que', () => {
+    expect(getAcceptedForms('ter de/que', 'presente')).toEqual([
+      ['tenho de', 'tenho que'],
+      ['tens de', 'tens que'],
+      ['tem de', 'tem que'],
+      ['temos de', 'temos que'],
+      ['têm de', 'têm que'],
+    ]);
+    expect(getAcceptedForms('ter de/que', 'pps')).toEqual([
+      ['tive de', 'tive que'],
+      ['tiveste de', 'tiveste que'],
+      ['teve de', 'teve que'],
+      ['tivemos de', 'tivemos que'],
+      ['tiveram de', 'tiveram que'],
+    ]);
   });
 });

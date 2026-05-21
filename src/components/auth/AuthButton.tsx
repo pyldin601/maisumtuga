@@ -59,14 +59,7 @@ export default function AuthButton() {
 
   if (isSignedIn) {
     return (
-      <button
-        className="dock__button"
-        type="button"
-        onClick={handleSignOut}
-        disabled={isDisabled}
-        aria-label={label}
-        title={label}
-      >
+      <button className="dock__button" type="button" onClick={handleSignOut} disabled={isDisabled} aria-label={label}>
         <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M14 4h-4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
           <path d="M17 16l4-4-4-4" />
@@ -77,14 +70,7 @@ export default function AuthButton() {
   }
 
   return (
-    <button
-      className="dock__button"
-      type="button"
-      onClick={handleSignIn}
-      disabled={isDisabled}
-      aria-label={label}
-      title={label}
-    >
+    <button className="dock__button" type="button" onClick={handleSignIn} disabled={isDisabled} aria-label={label}>
       <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M10 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
         <path d="M7 16l4-4-4-4" />

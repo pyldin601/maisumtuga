@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { QuizVerbType } from '../../state';
 
 const verbTypeOptions = [
@@ -14,10 +14,31 @@ interface SettingsButtonProps {
 
 export default function SettingsButton({ onQuizVerbTypeChange, quizVerbType }: SettingsButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement | null>(null);
   const popoverId = useId();
 
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event: PointerEvent): void => {
+      if (settingsRef.current?.contains(event.target as Node)) {
+        return;
+      }
+
+      setIsOpen(false);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="settings">
+    <div className="settings" ref={settingsRef}>
       {isOpen && (
         <div className="settings-popover" id={popoverId} role="group" aria-label="verbos">
           <p className="settings-popover__title">verbos:</p>
@@ -43,7 +64,6 @@ export default function SettingsButton({ onQuizVerbTypeChange, quizVerbType }: S
         aria-label="Definicoes"
         aria-controls={popoverId}
         aria-expanded={isOpen}
-        title="Definicoes"
         onClick={() => setIsOpen((nextIsOpen) => !nextIsOpen)}
       >
         <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">

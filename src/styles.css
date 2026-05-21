@@ -55,34 +55,131 @@ body {
   padding-inline: clamp(1rem, 4vw, 2.5rem);
 }
 
-.auth-button {
+.app-dock {
   position: fixed;
-  top: clamp(1rem, 3vw, 1.5rem);
-  right: clamp(1rem, 3vw, 1.5rem);
+  bottom: max(1.25em, env(safe-area-inset-bottom));
+  left: 50%;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
   border: 1px solid var(--white-faint);
-  border-radius: 999px;
-  padding: 0.42rem 0.72rem;
-  color: var(--white-muted);
+  border-radius: 1.4em;
+  padding: 0.28em;
   background: rgba(17, 16, 13, 0.72);
+  box-shadow: 0 0.75em 2.25em rgba(0, 0, 0, 0.18);
+  font-size: clamp(0.72rem, 2.8vw, 1rem);
+  transform: translateX(-50%);
+}
+
+.app-dock::before {
+  width: 1px;
+  height: 1.2em;
+  order: 1;
+  margin-inline: 0.35em;
+  background: var(--white-faint);
+  content: '';
+}
+
+.app-dock .dock__button:last-child {
+  order: 2;
+}
+
+.settings {
+  position: relative;
+  order: 2;
+}
+
+.dock__button {
+  width: 4em;
+  height: 4em;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  color: var(--white-faint);
+  background: transparent;
   cursor: pointer;
+}
+
+.dock__button:hover,
+.dock__button:focus-visible {
+  color: var(--white-strong);
+  outline: none;
+}
+
+.dock__button:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
+.dock__icon {
+  width: 2.7em;
+  height: 2.7em;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  transition: transform 140ms ease;
+}
+
+.dock__button:hover .dock__icon,
+.dock__button:focus-visible .dock__icon {
+  transform: scale(1.18);
+}
+
+.settings-popover {
+  min-width: 11em;
+  position: absolute;
+  bottom: calc(100% + 0.75em);
+  left: 50%;
+  border: 1px solid var(--white-faint);
+  border-radius: 0.7em;
+  padding: 0.8em;
+  color: var(--white-muted);
+  background: rgba(17, 16, 13, 0.94);
+  box-shadow: 0 1em 2.4em rgba(0, 0, 0, 0.26);
+  transform: translateX(-50%);
+}
+
+.settings-popover__title {
+  margin: 0 0 0.65em;
+  color: var(--white-strong);
   font:
-    400 0.84rem / 1.2 'SFMono-Regular',
+    400 0.84em / 1.2 'SFMono-Regular',
     Consolas,
     'Liberation Mono',
     monospace;
 }
 
-.auth-button:hover,
-.auth-button:focus-visible {
-  border-color: var(--white-muted);
-  color: var(--white-strong);
-  outline: none;
+.settings-popover__options {
+  display: grid;
+  gap: 0.45em;
 }
 
-.auth-button:disabled {
-  cursor: default;
-  opacity: 0.48;
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  cursor: pointer;
+  font:
+    400 0.86em / 1.2 'SFMono-Regular',
+    Consolas,
+    'Liberation Mono',
+    monospace;
+}
+
+.settings-option input {
+  width: 0.92em;
+  height: 0.92em;
+  accent-color: var(--white-strong);
+}
+
+.settings-option:hover,
+.settings-option:focus-within {
+  color: var(--white-strong);
 }
 
 .quiz-flow {

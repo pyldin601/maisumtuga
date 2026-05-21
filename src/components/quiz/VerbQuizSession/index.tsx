@@ -2,7 +2,7 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import VerbQuiz from '../VerbQuiz';
-import { LeitnerState, type VerbReviewSchedule } from '../../../state';
+import { LeitnerState, type QuizVerbType, type VerbReviewSchedule } from '../../../state';
 import { useVerbQuizSession } from './useVerbQuizSession';
 import { createQuizStream } from '../../../data/quizStream.ts';
 import type { VerbQuizQuestion } from '../../../data/verbTypes.ts';
@@ -20,8 +20,8 @@ type RowStyle = CSSProperties & {
   '--row-offset': number;
 };
 
-function createSessionQuestions(state: LeitnerState): readonly VerbQuizQuestion[] {
-  const quizStream = createQuizStream();
+function createSessionQuestions(state: LeitnerState, quizVerbType: QuizVerbType): readonly VerbQuizQuestion[] {
+  const quizStream = createQuizStream(quizVerbType);
   return quizStream.filter((quiz) => state.isItemDue(quiz)).slice(0, sessionQuestionLimit);
 }
 
@@ -94,13 +94,18 @@ async function loadUserSchedule(userId: string): Promise<VerbReviewSchedule> {
   return remoteSchedule;
 }
 
-export default function VerbQuizSession() {
+interface VerbQuizSessionProps {
+  quizVerbType: QuizVerbType;
+}
+
+export default function VerbQuizSession({ quizVerbType }: VerbQuizSessionProps) {
   const [leitnerState, setLeitnerState] = useState(() => createLeitnerState());
-  const [initialQuestions] = useState(() => createSessionQuestions(leitnerState));
+  const [initialQuestions] = useState(() => createSessionQuestions(leitnerState, quizVerbType));
   const { continueSession, isClosed, items, resolveCorrectQuestion, resolveWrongQuestion, showNextQuestion } =
     useVerbQuizSession(initialQuestions);
   const authLoadIdRef = useRef(0);
   const nextQuizTimeoutRef = useRef<number | null>(null);
+  const quizVerbTypeRef = useRef(quizVerbType);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
@@ -124,7 +129,7 @@ export default function VerbQuizSession() {
           setLeitnerState(nextState);
 
           if (!getSchedulesHaveSameItems(currentSchedule, schedule)) {
-            continueSession(createSessionQuestions(nextState));
+            continueSession(createSessionQuestions(nextState, quizVerbType));
           }
         })
         .catch(() => {
@@ -140,7 +145,22 @@ export default function VerbQuizSession() {
       authLoadIdRef.current += 1;
       unsubscribe();
     };
-  }, [continueSession]);
+  }, [continueSession, quizVerbType]);
+
+  useEffect(() => {
+    if (quizVerbTypeRef.current === quizVerbType) {
+      return;
+    }
+
+    quizVerbTypeRef.current = quizVerbType;
+
+    if (nextQuizTimeoutRef.current) {
+      window.clearTimeout(nextQuizTimeoutRef.current);
+      nextQuizTimeoutRef.current = null;
+    }
+
+    continueSession(createSessionQuestions(leitnerState, quizVerbType));
+  }, [continueSession, leitnerState, quizVerbType]);
 
   useEffect(() => {
     return () => {
@@ -180,7 +200,7 @@ export default function VerbQuizSession() {
   }
 
   function handleContinue(): void {
-    continueSession(createSessionQuestions(leitnerState));
+    continueSession(createSessionQuestions(leitnerState, quizVerbType));
   }
 
   const rowCount = items.length + (isClosed ? 1 : 0);

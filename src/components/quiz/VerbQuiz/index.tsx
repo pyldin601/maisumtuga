@@ -192,11 +192,11 @@ export default function VerbQuiz({
     }
   }, [autoFocus, isActive]);
 
-  function resolveCorrect(typedAnswer: string): void {
-    setTypedAnswer(typedAnswer);
+  function resolveCorrect(): void {
+    setTypedAnswer(answer);
     setStatus('correct');
     onCorrect({
-      answer: typedAnswer,
+      answer,
       expectedAnswer: answer,
       infinitiveForm,
       subject,
@@ -221,7 +221,7 @@ export default function VerbQuiz({
     setTypedAnswer(value);
 
     if (isAcceptedAnswer(value, acceptedAnswers)) {
-      resolveCorrect(value);
+      resolveCorrect();
     }
   }
 

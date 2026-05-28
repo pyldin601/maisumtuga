@@ -5,7 +5,7 @@ import VerbQuiz from '../VerbQuiz';
 import { LeitnerState, type QuizVerbType, type VerbReviewSchedule } from '../../../state';
 import { useVerbQuizSession } from './useVerbQuizSession';
 import { createQuizStream } from '../../../data/quizStream.ts';
-import type { VerbQuizQuestion } from '../../../data/verbTypes.ts';
+import type { VerbQuizQuestion, VerbTimeShortName } from '../../../data/verbTypes.ts';
 import { firebaseAuth } from '../../../firebase.ts';
 import {
   loadVerbReviewSchedule,
@@ -20,9 +20,16 @@ type RowStyle = CSSProperties & {
   '--row-offset': number;
 };
 
-function createSessionQuestions(state: LeitnerState, quizVerbType: QuizVerbType): readonly VerbQuizQuestion[] {
+function createSessionQuestions(
+  state: LeitnerState,
+  quizVerbType: QuizVerbType,
+  quizVerbTimes: readonly VerbTimeShortName[]
+): readonly VerbQuizQuestion[] {
+  const selectedVerbTimes = new Set(quizVerbTimes);
   const quizStream = createQuizStream(quizVerbType);
-  return quizStream.filter((quiz) => state.isItemDue(quiz)).slice(0, sessionQuestionLimit);
+  return quizStream
+    .filter((quiz) => selectedVerbTimes.has(quiz.time.shortName) && state.isItemDue(quiz))
+    .slice(0, sessionQuestionLimit);
 }
 
 function getStoredSchedule(): VerbReviewSchedule {
@@ -95,16 +102,18 @@ async function loadUserSchedule(userId: string): Promise<VerbReviewSchedule> {
 }
 
 interface VerbQuizSessionProps {
+  quizVerbTimes: readonly VerbTimeShortName[];
   quizVerbType: QuizVerbType;
 }
 
-export default function VerbQuizSession({ quizVerbType }: VerbQuizSessionProps) {
+export default function VerbQuizSession({ quizVerbTimes, quizVerbType }: VerbQuizSessionProps) {
   const [leitnerState, setLeitnerState] = useState(() => createLeitnerState());
-  const [initialQuestions] = useState(() => createSessionQuestions(leitnerState, quizVerbType));
+  const [initialQuestions] = useState(() => createSessionQuestions(leitnerState, quizVerbType, quizVerbTimes));
   const { continueSession, isClosed, items, resolveCorrectQuestion, resolveWrongQuestion, showNextQuestion } =
     useVerbQuizSession(initialQuestions);
   const authLoadIdRef = useRef(0);
   const nextQuizTimeoutRef = useRef<number | null>(null);
+  const quizVerbTimesRef = useRef(quizVerbTimes);
   const quizVerbTypeRef = useRef(quizVerbType);
 
   useEffect(() => {
@@ -129,7 +138,7 @@ export default function VerbQuizSession({ quizVerbType }: VerbQuizSessionProps) 
           setLeitnerState(nextState);
 
           if (!getSchedulesHaveSameItems(currentSchedule, schedule)) {
-            continueSession(createSessionQuestions(nextState, quizVerbType));
+            continueSession(createSessionQuestions(nextState, quizVerbType, quizVerbTimes));
           }
         })
         .catch(() => {
@@ -145,22 +154,23 @@ export default function VerbQuizSession({ quizVerbType }: VerbQuizSessionProps) 
       authLoadIdRef.current += 1;
       unsubscribe();
     };
-  }, [continueSession, quizVerbType]);
+  }, [continueSession, quizVerbTimes, quizVerbType]);
 
   useEffect(() => {
-    if (quizVerbTypeRef.current === quizVerbType) {
+    if (quizVerbTypeRef.current === quizVerbType && quizVerbTimesRef.current === quizVerbTimes) {
       return;
     }
 
     quizVerbTypeRef.current = quizVerbType;
+    quizVerbTimesRef.current = quizVerbTimes;
 
     if (nextQuizTimeoutRef.current) {
       window.clearTimeout(nextQuizTimeoutRef.current);
       nextQuizTimeoutRef.current = null;
     }
 
-    continueSession(createSessionQuestions(leitnerState, quizVerbType));
-  }, [continueSession, leitnerState, quizVerbType]);
+    continueSession(createSessionQuestions(leitnerState, quizVerbType, quizVerbTimes));
+  }, [continueSession, leitnerState, quizVerbTimes, quizVerbType]);
 
   useEffect(() => {
     return () => {
@@ -200,7 +210,7 @@ export default function VerbQuizSession({ quizVerbType }: VerbQuizSessionProps) 
   }
 
   function handleContinue(): void {
-    continueSession(createSessionQuestions(leitnerState, quizVerbType));
+    continueSession(createSessionQuestions(leitnerState, quizVerbType, quizVerbTimes));
   }
 
   const rowCount = items.length + (isClosed ? 1 : 0);

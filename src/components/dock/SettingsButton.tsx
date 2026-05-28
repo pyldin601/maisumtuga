@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import type { QuizVerbType } from '../../state';
+import { quizVerbTimeOptions, type QuizVerbType } from '../../state';
+import { a2VerbTimes } from '../../data/verbTime.ts';
+import type { VerbTimeShortName } from '../../data/verbTypes.ts';
 
 const verbTypeOptions = [
   { label: 'regular', value: 'regular' },
@@ -8,14 +10,37 @@ const verbTypeOptions = [
 ] as const;
 
 interface SettingsButtonProps {
+  onQuizVerbTimesChange(nextQuizVerbTimes: readonly VerbTimeShortName[]): void;
   onQuizVerbTypeChange(nextQuizVerbType: QuizVerbType): void;
+  quizVerbTimes: readonly VerbTimeShortName[];
   quizVerbType: QuizVerbType;
 }
 
-export default function SettingsButton({ onQuizVerbTypeChange, quizVerbType }: SettingsButtonProps) {
+export default function SettingsButton({
+  onQuizVerbTimesChange,
+  onQuizVerbTypeChange,
+  quizVerbTimes,
+  quizVerbType,
+}: SettingsButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement | null>(null);
   const popoverId = useId();
+
+  function handleQuizVerbTimeChange(verbTime: VerbTimeShortName): void {
+    const hasVerbTime = quizVerbTimes.includes(verbTime);
+
+    if (hasVerbTime && quizVerbTimes.length === 1) {
+      return;
+    }
+
+    const nextQuizVerbTimes = hasVerbTime
+      ? quizVerbTimes.filter((currentVerbTime) => currentVerbTime !== verbTime)
+      : quizVerbTimeOptions.filter(
+          (currentVerbTime) => currentVerbTime === verbTime || quizVerbTimes.includes(currentVerbTime)
+        );
+
+    onQuizVerbTimesChange(nextQuizVerbTimes);
+  }
 
   useEffect(() => {
     if (!isOpen) {
@@ -40,9 +65,9 @@ export default function SettingsButton({ onQuizVerbTypeChange, quizVerbType }: S
   return (
     <div className="settings" ref={settingsRef}>
       {isOpen && (
-        <div className="settings-popover" id={popoverId} role="group" aria-label="verbos">
-          <p className="settings-popover__title">verbos:</p>
-          <div className="settings-popover__options">
+        <div className="settings-popover" id={popoverId} aria-label="formas" role="group">
+          <div className="settings-popover__section">
+            <p className="settings-popover__title">verbos:</p>
             {verbTypeOptions.map((option) => (
               <label className="settings-option" key={option.value}>
                 <input
@@ -53,6 +78,22 @@ export default function SettingsButton({ onQuizVerbTypeChange, quizVerbType }: S
                   onChange={() => onQuizVerbTypeChange(option.value)}
                 />
                 <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          <div className="settings-popover__section">
+            <p className="settings-popover__title">tempos:</p>
+            {quizVerbTimeOptions.map((verbTime) => (
+              <label className="settings-option" key={verbTime}>
+                <input
+                  type="checkbox"
+                  name="verb-time"
+                  value={verbTime}
+                  checked={quizVerbTimes.includes(verbTime)}
+                  disabled={quizVerbTimes.includes(verbTime) && quizVerbTimes.length === 1}
+                  onChange={() => handleQuizVerbTimeChange(verbTime)}
+                />
+                <span>{a2VerbTimes[verbTime].fullName}</span>
               </label>
             ))}
           </div>

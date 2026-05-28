@@ -1,8 +1,19 @@
+import type { VerbTimeShortName } from './data/verbTypes.ts';
+
 const legacyProgressKey = 'leitner-progress';
 const verbReviewSchedulesKey = 'verbReviewSchedules';
 const quizVerbTypeKey = 'quizVerbType';
+const quizVerbTimesKey = 'quizVerbTimes';
 
 export type QuizVerbType = 'regular' | 'irregular' | 'both';
+
+export const quizVerbTimeOptions = [
+  'presente',
+  'pps',
+  'imperfeito',
+  'imperativoAfirmativo',
+  'imperativoNegativo',
+] as const satisfies readonly VerbTimeShortName[];
 
 type QuizItem = {
   infinitiveForm: string;
@@ -36,6 +47,34 @@ export function readQuizVerbType(): QuizVerbType {
 
 export function writeQuizVerbType(verbType: QuizVerbType): void {
   localStorage.setItem(quizVerbTypeKey, verbType);
+}
+
+function isQuizVerbTime(value: string): value is VerbTimeShortName {
+  return quizVerbTimeOptions.some((time) => time === value);
+}
+
+export function readQuizVerbTimes(): readonly VerbTimeShortName[] {
+  const storedVerbTimes = localStorage.getItem(quizVerbTimesKey);
+
+  if (!storedVerbTimes) {
+    return quizVerbTimeOptions;
+  }
+
+  const parsedVerbTimes = JSON.parse(storedVerbTimes) as unknown;
+
+  if (!Array.isArray(parsedVerbTimes)) {
+    return quizVerbTimeOptions;
+  }
+
+  const verbTimes = parsedVerbTimes.filter((value): value is VerbTimeShortName => {
+    return typeof value === 'string' && isQuizVerbTime(value);
+  });
+
+  return verbTimes.length > 0 ? verbTimes : quizVerbTimeOptions;
+}
+
+export function writeQuizVerbTimes(verbTimes: readonly VerbTimeShortName[]): void {
+  localStorage.setItem(quizVerbTimesKey, JSON.stringify(verbTimes));
 }
 
 type ProgressPatch = {

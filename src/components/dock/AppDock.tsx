@@ -18,13 +18,13 @@ export default function AppDock({
 }: AppDockProps) {
   return (
     <nav className="app-dock" aria-label="Aplicacao">
-      <AuthButton />
       <SettingsButton
         onQuizVerbTimesChange={onQuizVerbTimesChange}
         onQuizVerbTypeChange={onQuizVerbTypeChange}
         quizVerbTimes={quizVerbTimes}
         quizVerbType={quizVerbType}
       />
+      <AuthButton />
     </nav>
   );
 }

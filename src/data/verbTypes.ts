@@ -1,4 +1,4 @@
-export type VerbTimeShortName = 'presente' | 'pps';
+export type VerbTimeShortName = 'presente' | 'pps' | 'imperfeito';
 
 export type VerbTime = {
   fullName: string;

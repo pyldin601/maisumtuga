@@ -610,6 +610,32 @@ const ppsCases = [
   { infinitive: 'voltar', expected: ['voltei', 'voltaste', 'voltou', 'voltámos', 'voltaram'] },
 ] as const;
 
+const imperfeitoCases = [
+  { infinitive: 'falar', expected: ['falava', 'falavas', 'falava', 'falávamos', 'falavam'] },
+  { infinitive: 'comer', expected: ['comia', 'comias', 'comia', 'comíamos', 'comiam'] },
+  { infinitive: 'partir', expected: ['partia', 'partias', 'partia', 'partíamos', 'partiam'] },
+  { infinitive: 'chamar-se', expected: ['chamava-me', 'chamavas-te', 'chamava-se', 'chamávamo-nos', 'chamavam-se'] },
+  { infinitive: 'ser', expected: ['era', 'eras', 'era', 'éramos', 'eram'] },
+  { infinitive: 'ser bom em', expected: ['era bom em', 'eras bom em', 'era bom em', 'éramos bons em', 'eram bons em'] },
+  { infinitive: 'estar', expected: ['estava', 'estavas', 'estava', 'estávamos', 'estavam'] },
+  {
+    infinitive: 'estar perdido',
+    expected: ['estava perdido', 'estavas perdido', 'estava perdido', 'estávamos perdidos', 'estavam perdidos'],
+  },
+  { infinitive: 'ter', expected: ['tinha', 'tinhas', 'tinha', 'tínhamos', 'tinham'] },
+  { infinitive: 'ter de/que', expected: ['tinha de', 'tinhas de', 'tinha de', 'tínhamos de', 'tinham de'] },
+  { infinitive: 'ir', expected: ['ia', 'ias', 'ia', 'íamos', 'iam'] },
+  { infinitive: 'ir buscar', expected: ['ia buscar', 'ias buscar', 'ia buscar', 'íamos buscar', 'iam buscar'] },
+  {
+    infinitive: 'ir-se embora',
+    expected: ['ia-me embora', 'ias-te embora', 'ia-se embora', 'íamo-nos embora', 'iam-se embora'],
+  },
+  { infinitive: 'ver', expected: ['via', 'vias', 'via', 'víamos', 'viam'] },
+  { infinitive: 'vir', expected: ['vinha', 'vinhas', 'vinha', 'vínhamos', 'vinham'] },
+  { infinitive: 'pôr', expected: ['punha', 'punhas', 'punha', 'púnhamos', 'punham'] },
+  { infinitive: 'cair', expected: ['caía', 'caías', 'caía', 'caíamos', 'caíam'] },
+] as const;
+
 describe('Portuguese verb form generation', () => {
   test.each(presenteCases)('generates presente forms for $infinitive', ({ infinitive, expected }) => {
     expect(getForms(infinitive, 'presente')).toEqual(expected);
@@ -617,6 +643,10 @@ describe('Portuguese verb form generation', () => {
 
   test.each(ppsCases)('generates P.P.S. forms for $infinitive', ({ infinitive, expected }) => {
     expect(getForms(infinitive, 'pps')).toEqual(expected);
+  });
+
+  test.each(imperfeitoCases)('generates pretérito imperfeito forms for $infinitive', ({ infinitive, expected }) => {
+    expect(getForms(infinitive, 'imperfeito')).toEqual(expected);
   });
 
   test('accepts ter que as an alternative for ter de/que', () => {
@@ -633,6 +663,13 @@ describe('Portuguese verb form generation', () => {
       ['teve de', 'teve que'],
       ['tivemos de', 'tivemos que'],
       ['tiveram de', 'tiveram que'],
+    ]);
+    expect(getAcceptedForms('ter de/que', 'imperfeito')).toEqual([
+      ['tinha de', 'tinha que'],
+      ['tinhas de', 'tinhas que'],
+      ['tinha de', 'tinha que'],
+      ['tínhamos de', 'tínhamos que'],
+      ['tinham de', 'tinham que'],
     ]);
   });
 });

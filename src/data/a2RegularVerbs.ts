@@ -17,14 +17,17 @@ const regularEndings: Record<RegularVerbEnding, Record<VerbTimeShortName, string
   ar: {
     presente: ['o', 'as', 'a', 'amos', 'am'],
     pps: ['ei', 'aste', 'ou', 'ámos', 'aram'],
+    imperfeito: ['ava', 'avas', 'ava', 'ávamos', 'avam'],
   },
   er: {
     presente: ['o', 'es', 'e', 'emos', 'em'],
     pps: ['i', 'este', 'eu', 'emos', 'eram'],
+    imperfeito: ['ia', 'ias', 'ia', 'íamos', 'iam'],
   },
   ir: {
     presente: ['o', 'es', 'e', 'imos', 'em'],
     pps: ['i', 'iste', 'iu', 'imos', 'iram'],
+    imperfeito: ['ia', 'ias', 'ia', 'íamos', 'iam'],
   },
 };
 
@@ -279,6 +282,7 @@ function createRegularVerb(input: RegularVerbInput): Verb {
     times: {
       presente: createRegularForms(input, 'presente'),
       pps: createRegularForms(input, 'pps'),
+      imperfeito: createRegularForms(input, 'imperfeito'),
     },
   };
 }

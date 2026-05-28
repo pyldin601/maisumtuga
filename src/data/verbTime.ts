@@ -9,4 +9,8 @@ export const a2VerbTimes: Record<VerbTimeShortName, VerbTime> = {
     fullName: 'p.p.s.',
     shortName: 'pps',
   },
+  imperfeito: {
+    fullName: 'p. imperfeito',
+    shortName: 'imperfeito',
+  },
 };

@@ -4,9 +4,11 @@ import type { Verb } from './verbTypes.ts';
 const reflexivePronouns = ['-me', '-te', '-se', '-nos', '-se'];
 
 type CustomVerbInput = {
+  acceptedImperfeito?: string[];
   acceptedPps?: string[];
   acceptedPresente?: string[];
   infinitive: string;
+  imperfeito?: string[];
   translations: string[];
   presente: string[];
   pps: string[];
@@ -28,9 +30,11 @@ function addAcceptedAnswers(
 }
 
 function createCustomVerb({
+  acceptedImperfeito,
   acceptedPps,
   acceptedPresente,
   infinitive,
+  imperfeito,
   translations,
   presente,
   pps,
@@ -43,6 +47,10 @@ function createCustomVerb({
     times: {
       presente: addAcceptedAnswers(createVerbForms(presente), acceptedPresente),
       pps: addAcceptedAnswers(createVerbForms(pps), acceptedPps),
+      imperfeito: addAcceptedAnswers(
+        createVerbForms(imperfeito ?? createImperfeitoForms(infinitive)),
+        acceptedImperfeito
+      ),
     },
   };
 }
@@ -59,22 +67,72 @@ function withReflexive(forms: string[]): string[] {
   });
 }
 
+function getImperfeitoBaseForms(infinitive: string): string[] {
+  switch (infinitive) {
+    case 'ser':
+      return ['era', 'eras', 'era', 'éramos', 'eram'];
+    case 'ter':
+      return ['tinha', 'tinhas', 'tinha', 'tínhamos', 'tinham'];
+    case 'ir':
+      return ['ia', 'ias', 'ia', 'íamos', 'iam'];
+    case 'vir':
+      return ['vinha', 'vinhas', 'vinha', 'vínhamos', 'vinham'];
+    case 'pôr':
+      return ['punha', 'punhas', 'punha', 'púnhamos', 'punham'];
+    default:
+  }
+
+  const stem = infinitive.slice(0, -2);
+
+  if (infinitive.endsWith('ar')) {
+    return ['ava', 'avas', 'ava', 'ávamos', 'avam'].map((suffix) => `${stem}${suffix}`);
+  }
+
+  if (infinitive.endsWith('air')) {
+    return ['ía', 'ías', 'ía', 'íamos', 'íam'].map((suffix) => `${stem}${suffix}`);
+  }
+
+  if (infinitive.endsWith('er') || infinitive.endsWith('ir')) {
+    return ['ia', 'ias', 'ia', 'íamos', 'iam'].map((suffix) => `${stem}${suffix}`);
+  }
+
+  throw new Error(`Unsupported imperfeito form for ${infinitive}`);
+}
+
+function createImperfeitoForms(infinitive: string): string[] {
+  const [infinitiveHead, ...suffixParts] = infinitive.split(' ');
+  const suffix = suffixParts.join(' ');
+  const isReflexive = infinitiveHead.endsWith('-se');
+  const baseInfinitive = isReflexive ? infinitiveHead.slice(0, -3) : infinitiveHead;
+  const forms = getImperfeitoBaseForms(baseInfinitive);
+  const reflexiveForms = isReflexive ? withReflexive(forms) : forms;
+
+  return suffix ? withSuffix(reflexiveForms, suffix) : reflexiveForms;
+}
+
 const serPresente = ['sou', 'és', 'é', 'somos', 'são'];
 const serPps = ['fui', 'foste', 'foi', 'fomos', 'foram'];
+const serImperfeito = getImperfeitoBaseForms('ser');
 const estarPresente = ['estou', 'estás', 'está', 'estamos', 'estão'];
 const estarPps = ['estive', 'estiveste', 'esteve', 'estivemos', 'estiveram'];
+const estarImperfeito = getImperfeitoBaseForms('estar');
 const terPresente = ['tenho', 'tens', 'tem', 'temos', 'têm'];
 const terPps = ['tive', 'tiveste', 'teve', 'tivemos', 'tiveram'];
+const terImperfeito = getImperfeitoBaseForms('ter');
 const terDePresente = withSuffix(terPresente, 'de');
 const terDePps = withSuffix(terPps, 'de');
+const terDeImperfeito = withSuffix(terImperfeito, 'de');
 const terQuePresente = withSuffix(terPresente, 'que');
 const terQuePps = withSuffix(terPps, 'que');
+const terQueImperfeito = withSuffix(terImperfeito, 'que');
 const irPresente = ['vou', 'vais', 'vai', 'vamos', 'vão'];
 const irPps = serPps;
+const irImperfeito = getImperfeitoBaseForms('ir');
 const fazerPresente = ['faço', 'fazes', 'faz', 'fazemos', 'fazem'];
 const fazerPps = ['fiz', 'fizeste', 'fez', 'fizemos', 'fizeram'];
 const porPresente = ['ponho', 'pões', 'põe', 'pomos', 'põem'];
 const porPps = ['pus', 'puseste', 'pôs', 'pusemos', 'puseram'];
+const porImperfeito = getImperfeitoBaseForms('pôr');
 const pedirPresente = ['peço', 'pedes', 'pede', 'pedimos', 'pedem'];
 const pedirPps = ['pedi', 'pediste', 'pediu', 'pedimos', 'pediram'];
 const defaultBomEm = ['bom em', 'bom em', 'bom em', 'bons em', 'bons em'];
@@ -87,12 +145,14 @@ export const a2Verbs: Verb[] = [
     translations: ['to be'],
     presente: serPresente,
     pps: serPps,
+    imperfeito: serImperfeito,
   }),
   createCustomVerb({
     infinitive: 'ser bom em',
     translations: ['to be good at'],
     presente: withSuffix(serPresente, defaultBomEm),
     pps: withSuffix(serPps, defaultBomEm),
+    imperfeito: withSuffix(serImperfeito, defaultBomEm),
     notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
@@ -106,6 +166,7 @@ export const a2Verbs: Verb[] = [
     translations: ['to be lost'],
     presente: withSuffix(estarPresente, defaultPerdido),
     pps: withSuffix(estarPps, defaultPerdido),
+    imperfeito: withSuffix(estarImperfeito, defaultPerdido),
     notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
@@ -113,6 +174,7 @@ export const a2Verbs: Verb[] = [
     translations: ['to be dressed'],
     presente: withSuffix(estarPresente, defaultVestido),
     pps: withSuffix(estarPps, defaultVestido),
+    imperfeito: withSuffix(estarImperfeito, defaultVestido),
     notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
@@ -120,6 +182,7 @@ export const a2Verbs: Verb[] = [
     translations: ['to have'],
     presente: terPresente,
     pps: terPps,
+    imperfeito: terImperfeito,
   }),
   createCustomVerb({
     infinitive: 'ter interesse em',
@@ -132,8 +195,10 @@ export const a2Verbs: Verb[] = [
     translations: ['to have to'],
     presente: terDePresente,
     pps: terDePps,
+    imperfeito: terDeImperfeito,
     acceptedPresente: terQuePresente,
     acceptedPps: terQuePps,
+    acceptedImperfeito: terQueImperfeito,
   }),
   createCustomVerb({
     infinitive: 'ter saudades',
@@ -152,18 +217,21 @@ export const a2Verbs: Verb[] = [
     translations: ['to go'],
     presente: irPresente,
     pps: irPps,
+    imperfeito: irImperfeito,
   }),
   createCustomVerb({
     infinitive: 'ir buscar',
     translations: ['to fetch'],
     presente: withSuffix(irPresente, 'buscar'),
     pps: withSuffix(irPps, 'buscar'),
+    imperfeito: withSuffix(irImperfeito, 'buscar'),
   }),
   createCustomVerb({
     infinitive: 'ir-se embora',
     translations: ['to leave', 'to go away'],
     presente: withSuffix(withReflexive(irPresente), 'embora'),
     pps: withSuffix(withReflexive(irPps), 'embora'),
+    imperfeito: withSuffix(withReflexive(irImperfeito), 'embora'),
   }),
   createCustomVerb({
     infinitive: 'fazer',
@@ -242,12 +310,14 @@ export const a2Verbs: Verb[] = [
     translations: ['to put'],
     presente: porPresente,
     pps: porPps,
+    imperfeito: porImperfeito,
   }),
   createCustomVerb({
     infinitive: 'pôr a mesa',
     translations: ['to set the table'],
     presente: withSuffix(porPresente, 'a mesa'),
     pps: withSuffix(porPps, 'a mesa'),
+    imperfeito: withSuffix(porImperfeito, 'a mesa'),
   }),
   createCustomVerb({
     infinitive: 'cair',

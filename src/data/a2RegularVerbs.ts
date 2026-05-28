@@ -1,7 +1,8 @@
-import { createVerbForms } from './verbSubjects.ts';
+import { createImperativeVerbForms, createVerbForms } from './verbSubjects.ts';
 import type { Verb, VerbForm, VerbTimeShortName } from './verbTypes.ts';
 
 type RegularVerbEnding = 'ar' | 'er' | 'ir';
+type RegularIndicativeTime = Exclude<VerbTimeShortName, 'imperativoAfirmativo' | 'imperativoNegativo'>;
 
 type RegularVerbInput = {
   infinitive: string;
@@ -12,8 +13,10 @@ type RegularVerbInput = {
 };
 
 const reflexivePronouns = ['-me', '-te', '-se', '-nos', '-se'];
+const imperativeReflexivePronouns = ['-te', '-se', '-nos', '-se'];
+const negativeImperativeReflexivePronouns = ['te', 'se', 'nos', 'se'];
 
-const regularEndings: Record<RegularVerbEnding, Record<VerbTimeShortName, string[]>> = {
+const regularEndings: Record<RegularVerbEnding, Record<RegularIndicativeTime, string[]>> = {
   ar: {
     presente: ['o', 'as', 'a', 'amos', 'am'],
     pps: ['ei', 'aste', 'ou', 'ámos', 'aram'],
@@ -226,7 +229,7 @@ function getPpsStem(infinitive: string): string {
   return stem;
 }
 
-function createRegularFormValues(infinitive: string, time: keyof (typeof regularEndings)[RegularVerbEnding]): string[] {
+function createRegularFormValues(infinitive: string, time: RegularIndicativeTime): string[] {
   const ending = getRegularVerbEnding(infinitive);
 
   if (time === 'presente' && infinitive.endsWith('ear')) {
@@ -251,6 +254,52 @@ function createRegularFormValues(infinitive: string, time: keyof (typeof regular
   });
 }
 
+function getRegularSubjunctiveStem(infinitive: string): string {
+  const stem = infinitive.slice(0, -2);
+
+  if (infinitive.endsWith('çar')) {
+    return `${stem.slice(0, -1)}c`;
+  }
+
+  if (infinitive.endsWith('car')) {
+    return `${stem.slice(0, -1)}qu`;
+  }
+
+  if (infinitive.endsWith('gar')) {
+    return `${stem.slice(0, -1)}gu`;
+  }
+
+  if (infinitive.endsWith('cer')) {
+    return `${stem.slice(0, -1)}ç`;
+  }
+
+  return stem;
+}
+
+function createRegularImperativeFormValues(
+  infinitive: string,
+  time: 'imperativoAfirmativo' | 'imperativoNegativo'
+): string[] {
+  const ending = getRegularVerbEnding(infinitive);
+  const stem = infinitive.slice(0, -2);
+  const subjunctiveStem = getRegularSubjunctiveStem(infinitive);
+
+  if (ending === 'ar') {
+    return time === 'imperativoAfirmativo'
+      ? [`${stem}a`, `${subjunctiveStem}e`, `${subjunctiveStem}emos`, `${subjunctiveStem}em`]
+      : [
+          `não ${subjunctiveStem}es`,
+          `não ${subjunctiveStem}e`,
+          `não ${subjunctiveStem}emos`,
+          `não ${subjunctiveStem}em`,
+        ];
+  }
+
+  return time === 'imperativoAfirmativo'
+    ? [`${stem}e`, `${subjunctiveStem}a`, `${subjunctiveStem}amos`, `${subjunctiveStem}am`]
+    : [`não ${subjunctiveStem}as`, `não ${subjunctiveStem}a`, `não ${subjunctiveStem}amos`, `não ${subjunctiveStem}am`];
+}
+
 function applyVerbInputForm(value: string, input: RegularVerbInput, index: number): string {
   const suffix = Array.isArray(input.suffix) ? input.suffix[index] : input.suffix;
 
@@ -264,14 +313,50 @@ function applyVerbInputForm(value: string, input: RegularVerbInput, index: numbe
   return suffix ? `${reflexiveValue} ${suffix}` : reflexiveValue;
 }
 
-function createRegularForms(
+function applyImperativeVerbInputForm(
+  value: string,
   input: RegularVerbInput,
-  time: keyof (typeof regularEndings)[RegularVerbEnding]
-): VerbForm[] {
+  index: number,
+  time: 'imperativoAfirmativo' | 'imperativoNegativo'
+): string {
+  const suffix = Array.isArray(input.suffix) ? input.suffix[index] : input.suffix;
+
+  if (!input.reflexive) {
+    return suffix ? `${value} ${suffix}` : value;
+  }
+
+  if (time === 'imperativoNegativo') {
+    const [, verb] = value.split(' ');
+    const reflexiveValue = `não ${negativeImperativeReflexivePronouns[index]} ${verb}`;
+    return suffix ? `${reflexiveValue} ${suffix}` : reflexiveValue;
+  }
+
+  const reflexiveValue =
+    index === 2
+      ? `${value.slice(0, -1)}${imperativeReflexivePronouns[index]}`
+      : `${value}${imperativeReflexivePronouns[index]}`;
+
+  return suffix ? `${reflexiveValue} ${suffix}` : reflexiveValue;
+}
+
+function createRegularForms(input: RegularVerbInput, time: RegularIndicativeTime): VerbForm[] {
   const baseInfinitive = input.baseInfinitive ?? input.infinitive;
 
   return createVerbForms(
     createRegularFormValues(baseInfinitive, time).map((value, index) => applyVerbInputForm(value, input, index))
+  );
+}
+
+function createRegularImperativeForms(
+  input: RegularVerbInput,
+  time: 'imperativoAfirmativo' | 'imperativoNegativo'
+): VerbForm[] {
+  const baseInfinitive = input.baseInfinitive ?? input.infinitive;
+
+  return createImperativeVerbForms(
+    createRegularImperativeFormValues(baseInfinitive, time).map((value, index) =>
+      applyImperativeVerbInputForm(value, input, index, time)
+    )
   );
 }
 
@@ -283,6 +368,8 @@ function createRegularVerb(input: RegularVerbInput): Verb {
       presente: createRegularForms(input, 'presente'),
       pps: createRegularForms(input, 'pps'),
       imperfeito: createRegularForms(input, 'imperfeito'),
+      imperativoAfirmativo: createRegularImperativeForms(input, 'imperativoAfirmativo'),
+      imperativoNegativo: createRegularImperativeForms(input, 'imperativoNegativo'),
     },
   };
 }

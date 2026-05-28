@@ -1,4 +1,4 @@
-export type VerbTimeShortName = 'presente' | 'pps' | 'imperfeito';
+export type VerbTimeShortName = 'presente' | 'pps' | 'imperfeito' | 'imperativoAfirmativo' | 'imperativoNegativo';
 
 export type VerbTime = {
   fullName: string;

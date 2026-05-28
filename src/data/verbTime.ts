@@ -13,4 +13,12 @@ export const a2VerbTimes: Record<VerbTimeShortName, VerbTime> = {
     fullName: 'p. imperfeito',
     shortName: 'imperfeito',
   },
+  imperativoAfirmativo: {
+    fullName: 'imperativo afirmativo',
+    shortName: 'imperativoAfirmativo',
+  },
+  imperativoNegativo: {
+    fullName: 'imperativo negativo',
+    shortName: 'imperativoNegativo',
+  },
 };

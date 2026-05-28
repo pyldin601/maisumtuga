@@ -7,6 +7,8 @@
   --green: #73d68a;
   --red: #e2776f;
   --tense-futuro: #79c99a;
+  --tense-imperativo-afirmativo: #8fd0cf;
+  --tense-imperativo-negativo: #d99898;
   --tense-imperfeito: #c2a9df;
   --tense-pps: #88b7df;
   --tense-presente: #dfaa67;
@@ -276,6 +278,14 @@ body {
 
 .tense-label--imperfeito {
   color: var(--tense-imperfeito);
+}
+
+.tense-label--imperativoAfirmativo {
+  color: var(--tense-imperativo-afirmativo);
+}
+
+.tense-label--imperativoNegativo {
+  color: var(--tense-imperativo-negativo);
 }
 
 .tense-label--futuro {

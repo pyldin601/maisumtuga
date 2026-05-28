@@ -1,18 +1,31 @@
-import { createVerbForms } from './verbSubjects.ts';
+import { createImperativeVerbForms, createVerbForms } from './verbSubjects.ts';
 import type { Verb } from './verbTypes.ts';
 
 const reflexivePronouns = ['-me', '-te', '-se', '-nos', '-se'];
+const imperativeReflexivePronouns = ['-te', '-se', '-nos', '-se'];
+const negativeImperativeReflexivePronouns = ['te', 'se', 'nos', 'se'];
 
 type CustomVerbInput = {
   infinitive: string;
   imperfeito?: string[];
+  imperativoAfirmativo?: string[];
+  imperativoNegativo?: string[];
   translations: string[];
   presente: string[];
   pps: string[];
   notes?: string;
 };
 
-function createCustomVerb({ infinitive, imperfeito, translations, presente, pps, notes }: CustomVerbInput): Verb {
+function createCustomVerb({
+  infinitive,
+  imperfeito,
+  imperativoAfirmativo,
+  imperativoNegativo,
+  translations,
+  presente,
+  pps,
+  notes,
+}: CustomVerbInput): Verb {
   return {
     infinitive,
     translations,
@@ -21,6 +34,12 @@ function createCustomVerb({ infinitive, imperfeito, translations, presente, pps,
       presente: createVerbForms(presente),
       pps: createVerbForms(pps),
       imperfeito: createVerbForms(imperfeito ?? createImperfeitoForms(infinitive)),
+      imperativoAfirmativo: createImperativeVerbForms(
+        imperativoAfirmativo ?? createImperativoForms(infinitive, 'imperativoAfirmativo')
+      ),
+      imperativoNegativo: createImperativeVerbForms(
+        imperativoNegativo ?? createImperativoForms(infinitive, 'imperativoNegativo')
+      ),
     },
   };
 }
@@ -80,6 +99,85 @@ function createImperfeitoForms(infinitive: string): string[] {
   return suffix ? withSuffix(reflexiveForms, suffix) : reflexiveForms;
 }
 
+function getBaseInfinitive(infinitive: string): string {
+  const [infinitiveHead] = infinitive.split(' ');
+
+  return infinitiveHead.endsWith('-se') ? infinitiveHead.slice(0, -3) : infinitiveHead;
+}
+
+function getSubjunctiveBaseForms(infinitive: string): string[] {
+  switch (infinitive) {
+    case 'ser':
+      return ['seja', 'sejas', 'seja', 'sejamos', 'sejam'];
+    case 'estar':
+      return ['esteja', 'estejas', 'esteja', 'estejamos', 'estejam'];
+    case 'ir':
+      return ['vá', 'vás', 'vá', 'vamos', 'vão'];
+    case 'dar':
+      return ['dê', 'dês', 'dê', 'demos', 'deem'];
+    case 'saber':
+      return ['saiba', 'saibas', 'saiba', 'saibamos', 'saibam'];
+    case 'querer':
+      return ['queira', 'queiras', 'queira', 'queiramos', 'queiram'];
+    default:
+  }
+
+  const presente = basePresenteByInfinitive[infinitive];
+
+  if (!presente) {
+    throw new Error(`Missing presente forms for imperativo: ${infinitive}`);
+  }
+
+  const stem = presente[0].slice(0, -1);
+
+  if (infinitive.endsWith('ar')) {
+    return ['e', 'es', 'e', 'emos', 'em'].map((suffix) => `${stem}${suffix}`);
+  }
+
+  if (infinitive.endsWith('er') || infinitive.endsWith('ir') || infinitive === 'pôr') {
+    return ['a', 'as', 'a', 'amos', 'am'].map((suffix) => `${stem}${suffix}`);
+  }
+
+  throw new Error(`Unsupported imperativo form for ${infinitive}`);
+}
+
+function getImperativoBaseForms(infinitive: string, time: 'imperativoAfirmativo' | 'imperativoNegativo'): string[] {
+  const presente = basePresenteByInfinitive[infinitive];
+  const subjunctive = getSubjunctiveBaseForms(infinitive);
+  const affirmativeTu = infinitive === 'ser' ? 'sê' : (presente?.[2] ?? subjunctive[2]);
+
+  if (time === 'imperativoAfirmativo') {
+    return [affirmativeTu, subjunctive[2], subjunctive[3], subjunctive[4]];
+  }
+
+  return [`não ${subjunctive[1]}`, `não ${subjunctive[2]}`, `não ${subjunctive[3]}`, `não ${subjunctive[4]}`];
+}
+
+function applyReflexiveImperativoForms(forms: string[], time: 'imperativoAfirmativo' | 'imperativoNegativo'): string[] {
+  return forms.map((form, index) => {
+    if (time === 'imperativoNegativo') {
+      const [, verb] = form.split(' ');
+
+      return `não ${negativeImperativeReflexivePronouns[index]} ${verb}`;
+    }
+
+    return index === 2
+      ? `${form.slice(0, -1)}${imperativeReflexivePronouns[index]}`
+      : `${form}${imperativeReflexivePronouns[index]}`;
+  });
+}
+
+function createImperativoForms(infinitive: string, time: 'imperativoAfirmativo' | 'imperativoNegativo'): string[] {
+  const [, ...suffixParts] = infinitive.split(' ');
+  const suffix = suffixParts.join(' ');
+  const baseInfinitive = getBaseInfinitive(infinitive);
+  const isReflexive = infinitive.split(' ')[0].endsWith('-se');
+  const forms = getImperativoBaseForms(baseInfinitive, time);
+  const reflexiveForms = isReflexive ? applyReflexiveImperativoForms(forms, time) : forms;
+
+  return suffix ? withSuffix(reflexiveForms, suffix) : reflexiveForms;
+}
+
 const serPresente = ['sou', 'és', 'é', 'somos', 'são'];
 const serPps = ['fui', 'foste', 'foi', 'fomos', 'foram'];
 const serImperfeito = getImperfeitoBaseForms('ser');
@@ -103,8 +201,54 @@ const porImperfeito = getImperfeitoBaseForms('pôr');
 const pedirPresente = ['peço', 'pedes', 'pede', 'pedimos', 'pedem'];
 const pedirPps = ['pedi', 'pediste', 'pediu', 'pedimos', 'pediram'];
 const defaultBomEm = ['bom em', 'bom em', 'bom em', 'bons em', 'bons em'];
+const defaultBomEmImperativo = ['bom em', 'bom em', 'bons em', 'bons em'];
 const defaultPerdido = ['perdido', 'perdido', 'perdido', 'perdidos', 'perdidos'];
+const defaultPerdidoImperativo = ['perdido', 'perdido', 'perdidos', 'perdidos'];
 const defaultVestido = ['vestido', 'vestido', 'vestido', 'vestidos', 'vestidos'];
+const defaultVestidoImperativo = ['vestido', 'vestido', 'vestidos', 'vestidos'];
+
+const basePresenteByInfinitive: Record<string, string[]> = {
+  ser: serPresente,
+  estar: estarPresente,
+  ter: terPresente,
+  ir: irPresente,
+  fazer: fazerPresente,
+  dizer: ['digo', 'dizes', 'diz', 'dizemos', 'dizem'],
+  poder: ['posso', 'podes', 'pode', 'podemos', 'podem'],
+  querer: ['quero', 'queres', 'quer', 'queremos', 'querem'],
+  saber: ['sei', 'sabes', 'sabe', 'sabemos', 'sabem'],
+  ver: ['vejo', 'vês', 'vê', 'vemos', 'veem'],
+  vir: ['venho', 'vens', 'vem', 'vimos', 'vêm'],
+  dar: ['dou', 'dás', 'dá', 'damos', 'dão'],
+  pôr: porPresente,
+  cair: ['caio', 'cais', 'cai', 'caímos', 'caem'],
+  sair: ['saio', 'sais', 'sai', 'saímos', 'saem'],
+  trazer: ['trago', 'trazes', 'traz', 'trazemos', 'trazem'],
+  ler: ['leio', 'lês', 'lê', 'lemos', 'leem'],
+  ouvir: ['ouço', 'ouves', 'ouve', 'ouvimos', 'ouvem'],
+  pedir: pedirPresente,
+  conhecer: ['conheço', 'conheces', 'conhece', 'conhecemos', 'conhecem'],
+  preferir: ['prefiro', 'preferes', 'prefere', 'preferimos', 'preferem'],
+  conduzir: ['conduzo', 'conduzes', 'conduz', 'conduzimos', 'conduzem'],
+  dormir: ['durmo', 'dormes', 'dorme', 'dormimos', 'dormem'],
+  divertir: ['divirto', 'divertes', 'diverte', 'divertimos', 'divertem'],
+  conseguir: ['consigo', 'consegues', 'consegue', 'conseguimos', 'conseguem'],
+  descobrir: ['descubro', 'descobres', 'descobre', 'descobrimos', 'descobrem'],
+  sentir: ['sinto', 'sentes', 'sente', 'sentimos', 'sentem'],
+  servir: ['sirvo', 'serves', 'serve', 'servimos', 'servem'],
+  subir: ['subo', 'sobes', 'sobe', 'subimos', 'sobem'],
+  despedir: ['despeço', 'despedes', 'despede', 'despedimos', 'despedem'],
+  despir: ['dispo', 'despes', 'despe', 'despimos', 'despem'],
+  vestir: ['visto', 'vestes', 'veste', 'vestimos', 'vestem'],
+  morrer: ['morro', 'morres', 'morre', 'morremos', 'morrem'],
+  fugir: ['fujo', 'foges', 'foge', 'fugimos', 'fogem'],
+  seguir: ['sigo', 'segues', 'segue', 'seguimos', 'seguem'],
+};
+
+const serImperativoAfirmativo = getImperativoBaseForms('ser', 'imperativoAfirmativo');
+const serImperativoNegativo = getImperativoBaseForms('ser', 'imperativoNegativo');
+const estarImperativoAfirmativo = getImperativoBaseForms('estar', 'imperativoAfirmativo');
+const estarImperativoNegativo = getImperativoBaseForms('estar', 'imperativoNegativo');
 
 export const a2Verbs: Verb[] = [
   createCustomVerb({
@@ -120,6 +264,8 @@ export const a2Verbs: Verb[] = [
     presente: withSuffix(serPresente, defaultBomEm),
     pps: withSuffix(serPps, defaultBomEm),
     imperfeito: withSuffix(serImperfeito, defaultBomEm),
+    imperativoAfirmativo: withSuffix(serImperativoAfirmativo, defaultBomEmImperativo),
+    imperativoNegativo: withSuffix(serImperativoNegativo, defaultBomEmImperativo),
     notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
@@ -134,6 +280,8 @@ export const a2Verbs: Verb[] = [
     presente: withSuffix(estarPresente, defaultPerdido),
     pps: withSuffix(estarPps, defaultPerdido),
     imperfeito: withSuffix(estarImperfeito, defaultPerdido),
+    imperativoAfirmativo: withSuffix(estarImperativoAfirmativo, defaultPerdidoImperativo),
+    imperativoNegativo: withSuffix(estarImperativoNegativo, defaultPerdidoImperativo),
     notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({
@@ -142,6 +290,8 @@ export const a2Verbs: Verb[] = [
     presente: withSuffix(estarPresente, defaultVestido),
     pps: withSuffix(estarPps, defaultVestido),
     imperfeito: withSuffix(estarImperfeito, defaultVestido),
+    imperativoAfirmativo: withSuffix(estarImperativoAfirmativo, defaultVestidoImperativo),
+    imperativoNegativo: withSuffix(estarImperativoNegativo, defaultVestidoImperativo),
     notes: 'Uses masculine default adjective forms in quiz answers.',
   }),
   createCustomVerb({

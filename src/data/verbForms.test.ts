@@ -6,8 +6,13 @@ import type { Verb, VerbTimeShortName } from './verbTypes.ts';
 const allVerbs = [...a2Verbs, ...a2RegularVerbs];
 const verbsByInfinitive = new Map(allVerbs.map((verb) => [verb.infinitive, verb]));
 const subjects = ['eu', 'tu', 'voce', 'nos', 'voces'] as const;
+const imperativeSubjects = ['tu', 'voce', 'nos', 'voces'] as const;
 
-function getForms(infinitive: string, time: VerbTimeShortName): string[] {
+function getFormsForSubjects(
+  infinitive: string,
+  time: VerbTimeShortName,
+  selectedSubjects: readonly string[]
+): string[] {
   const verb = verbsByInfinitive.get(infinitive) as Verb | undefined;
 
   if (!verb) {
@@ -16,7 +21,7 @@ function getForms(infinitive: string, time: VerbTimeShortName): string[] {
 
   const formsBySubject = new Map(verb.times[time].map((form) => [form.subjectShort, form.form]));
 
-  return subjects.map((subject) => {
+  return selectedSubjects.map((subject) => {
     const form = formsBySubject.get(subject);
 
     if (!form) {
@@ -25,6 +30,14 @@ function getForms(infinitive: string, time: VerbTimeShortName): string[] {
 
     return form;
   });
+}
+
+function getForms(infinitive: string, time: VerbTimeShortName): string[] {
+  return getFormsForSubjects(infinitive, time, subjects);
+}
+
+function getImperativeForms(infinitive: string, time: VerbTimeShortName): string[] {
+  return getFormsForSubjects(infinitive, time, imperativeSubjects);
 }
 
 const presenteCases = [
@@ -616,6 +629,62 @@ const imperfeitoCases = [
   { infinitive: 'cair', expected: ['caía', 'caías', 'caía', 'caíamos', 'caíam'] },
 ] as const;
 
+const imperativoAfirmativoCases = [
+  { infinitive: 'falar', expected: ['fala', 'fale', 'falemos', 'falem'] },
+  { infinitive: 'comer', expected: ['come', 'coma', 'comamos', 'comam'] },
+  { infinitive: 'abrir', expected: ['abre', 'abra', 'abramos', 'abram'] },
+  { infinitive: 'começar', expected: ['começa', 'comece', 'comecemos', 'comecem'] },
+  { infinitive: 'pagar', expected: ['paga', 'pague', 'paguemos', 'paguem'] },
+  { infinitive: 'trocar', expected: ['troca', 'troque', 'troquemos', 'troquem'] },
+  { infinitive: 'chamar-se', expected: ['chama-te', 'chame-se', 'chamemo-nos', 'chamem-se'] },
+  { infinitive: 'ser', expected: ['sê', 'seja', 'sejamos', 'sejam'] },
+  { infinitive: 'ser bom em', expected: ['sê bom em', 'seja bom em', 'sejamos bons em', 'sejam bons em'] },
+  { infinitive: 'estar', expected: ['está', 'esteja', 'estejamos', 'estejam'] },
+  {
+    infinitive: 'estar perdido',
+    expected: ['está perdido', 'esteja perdido', 'estejamos perdidos', 'estejam perdidos'],
+  },
+  { infinitive: 'ter', expected: ['tem', 'tenha', 'tenhamos', 'tenham'] },
+  { infinitive: 'ter de', expected: ['tem de', 'tenha de', 'tenhamos de', 'tenham de'] },
+  { infinitive: 'ir', expected: ['vai', 'vá', 'vamos', 'vão'] },
+  { infinitive: 'ir-se embora', expected: ['vai-te embora', 'vá-se embora', 'vamo-nos embora', 'vão-se embora'] },
+  { infinitive: 'dar', expected: ['dá', 'dê', 'demos', 'deem'] },
+  { infinitive: 'querer', expected: ['quer', 'queira', 'queiramos', 'queiram'] },
+  { infinitive: 'pôr', expected: ['põe', 'ponha', 'ponhamos', 'ponham'] },
+  { infinitive: 'cair', expected: ['cai', 'caia', 'caiamos', 'caiam'] },
+] as const;
+
+const imperativoNegativoCases = [
+  { infinitive: 'falar', expected: ['não fales', 'não fale', 'não falemos', 'não falem'] },
+  { infinitive: 'comer', expected: ['não comas', 'não coma', 'não comamos', 'não comam'] },
+  { infinitive: 'abrir', expected: ['não abras', 'não abra', 'não abramos', 'não abram'] },
+  { infinitive: 'começar', expected: ['não comeces', 'não comece', 'não comecemos', 'não comecem'] },
+  { infinitive: 'pagar', expected: ['não pagues', 'não pague', 'não paguemos', 'não paguem'] },
+  { infinitive: 'trocar', expected: ['não troques', 'não troque', 'não troquemos', 'não troquem'] },
+  { infinitive: 'chamar-se', expected: ['não te chames', 'não se chame', 'não nos chamemos', 'não se chamem'] },
+  { infinitive: 'ser', expected: ['não sejas', 'não seja', 'não sejamos', 'não sejam'] },
+  {
+    infinitive: 'ser bom em',
+    expected: ['não sejas bom em', 'não seja bom em', 'não sejamos bons em', 'não sejam bons em'],
+  },
+  { infinitive: 'estar', expected: ['não estejas', 'não esteja', 'não estejamos', 'não estejam'] },
+  {
+    infinitive: 'estar perdido',
+    expected: ['não estejas perdido', 'não esteja perdido', 'não estejamos perdidos', 'não estejam perdidos'],
+  },
+  { infinitive: 'ter', expected: ['não tenhas', 'não tenha', 'não tenhamos', 'não tenham'] },
+  { infinitive: 'ter de', expected: ['não tenhas de', 'não tenha de', 'não tenhamos de', 'não tenham de'] },
+  { infinitive: 'ir', expected: ['não vás', 'não vá', 'não vamos', 'não vão'] },
+  {
+    infinitive: 'ir-se embora',
+    expected: ['não te vás embora', 'não se vá embora', 'não nos vamos embora', 'não se vão embora'],
+  },
+  { infinitive: 'dar', expected: ['não dês', 'não dê', 'não demos', 'não deem'] },
+  { infinitive: 'querer', expected: ['não queiras', 'não queira', 'não queiramos', 'não queiram'] },
+  { infinitive: 'pôr', expected: ['não ponhas', 'não ponha', 'não ponhamos', 'não ponham'] },
+  { infinitive: 'cair', expected: ['não caias', 'não caia', 'não caiamos', 'não caiam'] },
+] as const;
+
 describe('Portuguese verb form generation', () => {
   test.each(presenteCases)('generates presente forms for $infinitive', ({ infinitive, expected }) => {
     expect(getForms(infinitive, 'presente')).toEqual(expected);
@@ -628,4 +697,18 @@ describe('Portuguese verb form generation', () => {
   test.each(imperfeitoCases)('generates pretérito imperfeito forms for $infinitive', ({ infinitive, expected }) => {
     expect(getForms(infinitive, 'imperfeito')).toEqual(expected);
   });
+
+  test.each(imperativoAfirmativoCases)(
+    'generates imperativo afirmativo forms for $infinitive',
+    ({ infinitive, expected }) => {
+      expect(getImperativeForms(infinitive, 'imperativoAfirmativo')).toEqual(expected);
+    }
+  );
+
+  test.each(imperativoNegativoCases)(
+    'generates imperativo negativo forms for $infinitive',
+    ({ infinitive, expected }) => {
+      expect(getImperativeForms(infinitive, 'imperativoNegativo')).toEqual(expected);
+    }
+  );
 });

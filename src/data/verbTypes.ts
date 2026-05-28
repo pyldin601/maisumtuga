@@ -11,7 +11,6 @@ export type VerbSubject = {
 };
 
 export type VerbForm = {
-  acceptedAnswers?: readonly string[];
   form: string;
   subjectFull: string;
   subjectShort: string;
@@ -25,7 +24,6 @@ export type Verb = {
 };
 
 export type VerbQuizQuestion = {
-  acceptedAnswers: readonly string[];
   correctAnswer: string;
   infinitiveForm: string;
   subjectFull: string;

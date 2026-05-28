@@ -4,9 +4,6 @@ import type { Verb } from './verbTypes.ts';
 const reflexivePronouns = ['-me', '-te', '-se', '-nos', '-se'];
 
 type CustomVerbInput = {
-  acceptedImperfeito?: string[];
-  acceptedPps?: string[];
-  acceptedPresente?: string[];
   infinitive: string;
   imperfeito?: string[];
   translations: string[];
@@ -15,42 +12,15 @@ type CustomVerbInput = {
   notes?: string;
 };
 
-function addAcceptedAnswers(
-  forms: ReturnType<typeof createVerbForms>,
-  acceptedAnswers?: string[]
-): ReturnType<typeof createVerbForms> {
-  if (!acceptedAnswers) {
-    return forms;
-  }
-
-  return forms.map((form, index) => ({
-    ...form,
-    acceptedAnswers: acceptedAnswers[index] ? [acceptedAnswers[index]] : [],
-  }));
-}
-
-function createCustomVerb({
-  acceptedImperfeito,
-  acceptedPps,
-  acceptedPresente,
-  infinitive,
-  imperfeito,
-  translations,
-  presente,
-  pps,
-  notes,
-}: CustomVerbInput): Verb {
+function createCustomVerb({ infinitive, imperfeito, translations, presente, pps, notes }: CustomVerbInput): Verb {
   return {
     infinitive,
     translations,
     notes,
     times: {
-      presente: addAcceptedAnswers(createVerbForms(presente), acceptedPresente),
-      pps: addAcceptedAnswers(createVerbForms(pps), acceptedPps),
-      imperfeito: addAcceptedAnswers(
-        createVerbForms(imperfeito ?? createImperfeitoForms(infinitive)),
-        acceptedImperfeito
-      ),
+      presente: createVerbForms(presente),
+      pps: createVerbForms(pps),
+      imperfeito: createVerbForms(imperfeito ?? createImperfeitoForms(infinitive)),
     },
   };
 }
@@ -122,9 +92,6 @@ const terImperfeito = getImperfeitoBaseForms('ter');
 const terDePresente = withSuffix(terPresente, 'de');
 const terDePps = withSuffix(terPps, 'de');
 const terDeImperfeito = withSuffix(terImperfeito, 'de');
-const terQuePresente = withSuffix(terPresente, 'que');
-const terQuePps = withSuffix(terPps, 'que');
-const terQueImperfeito = withSuffix(terImperfeito, 'que');
 const irPresente = ['vou', 'vais', 'vai', 'vamos', 'vão'];
 const irPps = serPps;
 const irImperfeito = getImperfeitoBaseForms('ir');
@@ -191,14 +158,11 @@ export const a2Verbs: Verb[] = [
     pps: withSuffix(terPps, 'interesse em'),
   }),
   createCustomVerb({
-    infinitive: 'ter de/que',
+    infinitive: 'ter de',
     translations: ['to have to'],
     presente: terDePresente,
     pps: terDePps,
     imperfeito: terDeImperfeito,
-    acceptedPresente: terQuePresente,
-    acceptedPps: terQuePps,
-    acceptedImperfeito: terQueImperfeito,
   }),
   createCustomVerb({
     infinitive: 'ter saudades',

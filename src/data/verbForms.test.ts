@@ -27,26 +27,6 @@ function getForms(infinitive: string, time: VerbTimeShortName): string[] {
   });
 }
 
-function getAcceptedForms(infinitive: string, time: VerbTimeShortName): string[][] {
-  const verb = verbsByInfinitive.get(infinitive) as Verb | undefined;
-
-  if (!verb) {
-    throw new Error(`Missing verb fixture: ${infinitive}`);
-  }
-
-  const formsBySubject = new Map(verb.times[time].map((form) => [form.subjectShort, form]));
-
-  return subjects.map((subject) => {
-    const form = formsBySubject.get(subject);
-
-    if (!form) {
-      throw new Error(`Missing ${time} form for ${infinitive} / ${subject}`);
-    }
-
-    return [form.form, ...(form.acceptedAnswers ?? [])];
-  });
-}
-
 const presenteCases = [
   { infinitive: 'abrir', expected: ['abro', 'abres', 'abre', 'abrimos', 'abrem'] },
   { infinitive: 'acabar', expected: ['acabo', 'acabas', 'acaba', 'acabamos', 'acabam'] },
@@ -282,7 +262,7 @@ const presenteCases = [
   { infinitive: 'tapar', expected: ['tapo', 'tapas', 'tapa', 'tapamos', 'tapam'] },
   { infinitive: 'telefonar', expected: ['telefono', 'telefonas', 'telefona', 'telefonamos', 'telefonam'] },
   { infinitive: 'ter', expected: ['tenho', 'tens', 'tem', 'temos', 'têm'] },
-  { infinitive: 'ter de/que', expected: ['tenho de', 'tens de', 'tem de', 'temos de', 'têm de'] },
+  { infinitive: 'ter de', expected: ['tenho de', 'tens de', 'tem de', 'temos de', 'têm de'] },
   {
     infinitive: 'ter interesse em',
     expected: ['tenho interesse em', 'tens interesse em', 'tem interesse em', 'temos interesse em', 'têm interesse em'],
@@ -574,7 +554,7 @@ const ppsCases = [
   { infinitive: 'tapar', expected: ['tapei', 'tapaste', 'tapou', 'tapámos', 'taparam'] },
   { infinitive: 'telefonar', expected: ['telefonei', 'telefonaste', 'telefonou', 'telefonámos', 'telefonaram'] },
   { infinitive: 'ter', expected: ['tive', 'tiveste', 'teve', 'tivemos', 'tiveram'] },
-  { infinitive: 'ter de/que', expected: ['tive de', 'tiveste de', 'teve de', 'tivemos de', 'tiveram de'] },
+  { infinitive: 'ter de', expected: ['tive de', 'tiveste de', 'teve de', 'tivemos de', 'tiveram de'] },
   {
     infinitive: 'ter interesse em',
     expected: [
@@ -623,7 +603,7 @@ const imperfeitoCases = [
     expected: ['estava perdido', 'estavas perdido', 'estava perdido', 'estávamos perdidos', 'estavam perdidos'],
   },
   { infinitive: 'ter', expected: ['tinha', 'tinhas', 'tinha', 'tínhamos', 'tinham'] },
-  { infinitive: 'ter de/que', expected: ['tinha de', 'tinhas de', 'tinha de', 'tínhamos de', 'tinham de'] },
+  { infinitive: 'ter de', expected: ['tinha de', 'tinhas de', 'tinha de', 'tínhamos de', 'tinham de'] },
   { infinitive: 'ir', expected: ['ia', 'ias', 'ia', 'íamos', 'iam'] },
   { infinitive: 'ir buscar', expected: ['ia buscar', 'ias buscar', 'ia buscar', 'íamos buscar', 'iam buscar'] },
   {
@@ -647,29 +627,5 @@ describe('Portuguese verb form generation', () => {
 
   test.each(imperfeitoCases)('generates pretérito imperfeito forms for $infinitive', ({ infinitive, expected }) => {
     expect(getForms(infinitive, 'imperfeito')).toEqual(expected);
-  });
-
-  test('accepts ter que as an alternative for ter de/que', () => {
-    expect(getAcceptedForms('ter de/que', 'presente')).toEqual([
-      ['tenho de', 'tenho que'],
-      ['tens de', 'tens que'],
-      ['tem de', 'tem que'],
-      ['temos de', 'temos que'],
-      ['têm de', 'têm que'],
-    ]);
-    expect(getAcceptedForms('ter de/que', 'pps')).toEqual([
-      ['tive de', 'tive que'],
-      ['tiveste de', 'tiveste que'],
-      ['teve de', 'teve que'],
-      ['tivemos de', 'tivemos que'],
-      ['tiveram de', 'tiveram que'],
-    ]);
-    expect(getAcceptedForms('ter de/que', 'imperfeito')).toEqual([
-      ['tinha de', 'tinha que'],
-      ['tinhas de', 'tinhas que'],
-      ['tinha de', 'tinha que'],
-      ['tínhamos de', 'tínhamos que'],
-      ['tinham de', 'tinham que'],
-    ]);
   });
 });

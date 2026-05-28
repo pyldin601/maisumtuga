@@ -21,7 +21,6 @@ export function createQuizStream(verbType: QuizVerbType): readonly VerbQuizQuest
   return a2SessionVerbs.flatMap((verb) =>
     Object.entries(verb.times).flatMap(([timeShortName, forms]) =>
       forms.map((form) => ({
-        acceptedAnswers: [form.form, ...(form.acceptedAnswers ?? [])],
         correctAnswer: form.form,
         infinitiveForm: verb.infinitive,
         subjectFull: form.subjectFull,

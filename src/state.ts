@@ -188,17 +188,21 @@ export class LeitnerState {
 
   moveItemToFirstBox(item: QuizItem): void {
     const key = getKey(item);
+    const nextProgress = { box: 1, due: Date.now() };
 
-    // it hits the first box by default
-    delete this.progress[key];
-
+    this.progress[key] = nextProgress;
     this.save();
-    this.syncProgressPatch?.({ key, updatedAt: this.updatedAt, value: null });
+    this.syncProgressPatch?.({ key, updatedAt: this.updatedAt, value: nextProgress });
+  }
+
+  getItemProgress(item: QuizItem): WordProgress | undefined {
+    const key = getKey(item);
+
+    return this.progress[key];
   }
 
   isItemDue(item: QuizItem): boolean {
-    const key = getKey(item);
-    const wordProgress = this.progress[key];
+    const wordProgress = this.getItemProgress(item);
 
     if (!wordProgress) {
       return true;

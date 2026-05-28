@@ -27,9 +27,27 @@ function createSessionQuestions(
 ): readonly VerbQuizQuestion[] {
   const selectedVerbTimes = new Set(quizVerbTimes);
   const quizStream = createQuizStream(quizVerbType);
-  return quizStream
-    .filter((quiz) => selectedVerbTimes.has(quiz.time.shortName) && state.isItemDue(quiz))
-    .slice(0, sessionQuestionLimit);
+  const dueQuestions: VerbQuizQuestion[] = [];
+  const newQuestions: VerbQuizQuestion[] = [];
+
+  quizStream.forEach((quiz) => {
+    if (!selectedVerbTimes.has(quiz.time.shortName)) {
+      return;
+    }
+
+    const progress = state.getItemProgress(quiz);
+
+    if (!progress) {
+      newQuestions.push(quiz);
+      return;
+    }
+
+    if (Date.now() >= progress.due) {
+      dueQuestions.push(quiz);
+    }
+  });
+
+  return [...dueQuestions, ...newQuestions].slice(0, sessionQuestionLimit);
 }
 
 function getStoredSchedule(): VerbReviewSchedule {

@@ -102,9 +102,10 @@ export default function SettingsButton({
       <button
         className="dock__button"
         type="button"
-        aria-label="Definicoes"
+        aria-label="Definições"
         aria-controls={popoverId}
         aria-expanded={isOpen}
+        data-tooltip="definições"
         onClick={() => setIsOpen((nextIsOpen) => !nextIsOpen)}
       >
         <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">

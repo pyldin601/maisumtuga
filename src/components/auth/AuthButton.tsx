@@ -55,11 +55,18 @@ export default function AuthButton() {
 
   const isSignedIn = Boolean(user) || (!isAuthReady && cachedIsSignedIn);
   const isDisabled = isSubmitting;
-  const label = isSubmitting ? (isSignedIn ? 'A sair...' : 'A entrar...') : isSignedIn ? 'Sair' : 'Entrar com Google';
+  const label = isSubmitting ? (isSignedIn ? 'a sair...' : 'a entrar...') : isSignedIn ? 'sair' : 'entrar com google';
 
   if (isSignedIn) {
     return (
-      <button className="dock__button" type="button" onClick={handleSignOut} disabled={isDisabled} aria-label={label}>
+      <button
+        className="dock__button"
+        type="button"
+        onClick={handleSignOut}
+        disabled={isDisabled}
+        aria-label={label}
+        data-tooltip={label}
+      >
         <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M14 4h-4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
           <path d="M11 12h10m-4-4 4 4-4 4" />
@@ -69,7 +76,14 @@ export default function AuthButton() {
   }
 
   return (
-    <button className="dock__button" type="button" onClick={handleSignIn} disabled={isDisabled} aria-label={label}>
+    <button
+      className="dock__button"
+      type="button"
+      onClick={handleSignIn}
+      disabled={isDisabled}
+      aria-label={label}
+      data-tooltip={label}
+    >
       <svg className="dock__icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M10 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
         <path d="M3 12h8m-4-4 4 4-4 4" />

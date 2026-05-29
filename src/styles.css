@@ -101,6 +101,7 @@ body {
 .dock__button {
   width: 4em;
   height: 4em;
+  position: relative;
   display: grid;
   place-items: center;
   border: 0;
@@ -257,7 +258,8 @@ body {
   text-underline-offset: 0.18em;
 }
 
-.prompt-part--hint::after {
+.prompt-part--hint::after,
+.dock__button::after {
   position: absolute;
   bottom: calc(100% + 0.45rem);
   left: 50%;
@@ -269,7 +271,7 @@ body {
   background: rgba(17, 16, 13, 0.92);
   box-shadow: 0 0.45rem 1.4rem rgba(0, 0, 0, 0.28);
   content: attr(data-hint);
-  font-size: 0.78em;
+  font-size: clamp(0.72rem, 2.34vw, 1.05rem);
   line-height: 1.2;
   opacity: 0;
   pointer-events: none;
@@ -277,11 +279,26 @@ body {
   transition:
     opacity 120ms ease,
     transform 120ms ease;
+  white-space: nowrap;
 }
 
-.prompt-part--hint:hover::after {
+.prompt-part--hint::after {
+  content: attr(data-hint);
+}
+
+.dock__button::after {
+  content: attr(data-tooltip);
+}
+
+.prompt-part--hint:hover::after,
+.dock__button:hover::after,
+.dock__button:focus-visible::after {
   opacity: 1;
   transform: translate(-50%, 0);
+}
+
+.dock__button[aria-expanded='true']::after {
+  opacity: 0;
 }
 
 .tense-label {

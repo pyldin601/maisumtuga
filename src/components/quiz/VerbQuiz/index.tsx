@@ -13,6 +13,7 @@ type PromptPart = {
 };
 
 type PromptProps = {
+  onHintPeek?: () => void;
   parts: PromptPart[];
 };
 
@@ -34,6 +35,7 @@ type VerbQuizProps = {
   infinitiveForm: string;
   isActive?: boolean;
   onCorrect?: (result: QuizResult) => void;
+  onHintPeek?: () => void;
   onWrong?: (result: QuizResult) => void;
   showHints?: boolean;
   subject: string;
@@ -83,7 +85,7 @@ function normalizeAnswer(value: string): string {
     .replace(/\p{Diacritic}/gu, '');
 }
 
-function AnimatedPrompt({ parts, speed = promptAnimationSpeed }: AnimatedPromptProps) {
+function AnimatedPrompt({ onHintPeek = () => {}, parts, speed = promptAnimationSpeed }: AnimatedPromptProps) {
   const text = useMemo(() => parts.map((part) => part.text).join(''), [parts]);
   const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [visibleLength, setVisibleLength] = useState(() => (shouldReduceMotion ? text.length : 0));
@@ -133,7 +135,12 @@ function AnimatedPrompt({ parts, speed = promptAnimationSpeed }: AnimatedPromptP
   return (
     <p aria-label={text}>
       {visibleParts.map((part, index) => (
-        <span className={getPromptPartClassName(part)} data-hint={part.hint} key={index}>
+        <span
+          className={getPromptPartClassName(part)}
+          data-hint={part.hint}
+          key={index}
+          onPointerEnter={part.hint ? onHintPeek : undefined}
+        >
           {part.text}
         </span>
       ))}
@@ -142,11 +149,16 @@ function AnimatedPrompt({ parts, speed = promptAnimationSpeed }: AnimatedPromptP
   );
 }
 
-function StaticPrompt({ parts }: PromptProps) {
+function StaticPrompt({ onHintPeek = () => {}, parts }: PromptProps) {
   return (
     <p>
       {parts.map((part, index) => (
-        <span className={getPromptPartClassName(part)} data-hint={part.hint} key={`${part.text}-${index}`}>
+        <span
+          className={getPromptPartClassName(part)}
+          data-hint={part.hint}
+          key={`${part.text}-${index}`}
+          onPointerEnter={part.hint ? onHintPeek : undefined}
+        >
           {part.text}
         </span>
       ))}
@@ -160,6 +172,7 @@ export default function VerbQuiz({
   infinitiveForm,
   isActive = true,
   onCorrect = () => {},
+  onHintPeek = () => {},
   onWrong = () => {},
   showHints = true,
   subject,
@@ -229,7 +242,11 @@ export default function VerbQuiz({
   return (
     <>
       <div className="quiz__prompt">
-        {isActive ? <AnimatedPrompt parts={promptParts} /> : <StaticPrompt parts={promptParts} />}
+        {isActive ? (
+          <AnimatedPrompt onHintPeek={onHintPeek} parts={promptParts} />
+        ) : (
+          <StaticPrompt onHintPeek={onHintPeek} parts={promptParts} />
+        )}
       </div>
 
       <label

@@ -45,11 +45,17 @@ function createSessionQuestions(
 
 interface VerbQuizSessionProps {
   leitnerState: LeitnerState;
+  onHintPeek?: () => void;
   quizVerbTimes: readonly VerbTimeShortName[];
   quizVerbType: QuizVerbType;
 }
 
-export default function VerbQuizSession({ leitnerState, quizVerbTimes, quizVerbType }: VerbQuizSessionProps) {
+export default function VerbQuizSession({
+  leitnerState,
+  onHintPeek,
+  quizVerbTimes,
+  quizVerbType,
+}: VerbQuizSessionProps) {
   const [initialQuestions] = useState(() => createSessionQuestions(leitnerState, quizVerbType, quizVerbTimes));
   const { continueSession, isClosed, items, resolveCorrectQuestion, resolveWrongQuestion, showNextQuestion } =
     useVerbQuizSession(initialQuestions);
@@ -144,6 +150,7 @@ export default function VerbQuizSession({ leitnerState, quizVerbTimes, quizVerbT
               infinitiveForm={item.question.infinitiveForm}
               isActive={isActive}
               onCorrect={(result) => handleCorrect(item.answer.answerId, result.answer)}
+              onHintPeek={onHintPeek}
               onWrong={(result) => handleWrong(item.answer.answerId, result.answer)}
               showHints={!isHistory}
               subject={item.question.subjectFull}

@@ -156,11 +156,9 @@ body {
 .settings-popover__title {
   margin: 0 0 0.65em;
   color: var(--white-strong);
-  font:
-    400 0.84em / 1.2 'SFMono-Regular',
-    Consolas,
-    'Liberation Mono',
-    monospace;
+  font-size: 0.84em;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .settings-popover__section {
@@ -179,11 +177,9 @@ body {
   align-items: center;
   gap: 0.55em;
   cursor: pointer;
-  font:
-    400 0.86em / 1.2 'SFMono-Regular',
-    Consolas,
-    'Liberation Mono',
-    monospace;
+  font-size: 0.86em;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .settings-option input {
@@ -432,11 +428,9 @@ body {
 .session-closed p {
   margin: 0;
   color: var(--white-muted);
-  font:
-    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 'SFMono-Regular',
-    Consolas,
-    'Liberation Mono',
-    monospace;
+  font-size: clamp(1.5rem, 5vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .session-closed button {
@@ -446,11 +440,10 @@ body {
   color: var(--white-faint);
   background: transparent;
   cursor: pointer;
-  font:
-    400 clamp(0.92rem, 3vw, 1.35rem) / 1.4 'SFMono-Regular',
-    Consolas,
-    'Liberation Mono',
-    monospace;
+  font-family: inherit;
+  font-size: clamp(0.92rem, 3vw, 1.35rem);
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .session-closed button:focus-visible,

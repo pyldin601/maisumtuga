@@ -58,6 +58,19 @@ body {
   padding-inline: clamp(1rem, 4vw, 2.5rem);
 }
 
+.fry-peek {
+  width: clamp(5.75rem, 16vw, 9.5rem);
+  position: fixed;
+  left: clamp(0.75rem, 4vw, 2.5rem);
+  bottom: 0;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+  transform: translateY(108%);
+  animation: fry-peek 7200ms ease-in-out 520ms both;
+  user-select: none;
+}
+
 .app-dock {
   position: fixed;
   bottom: max(1.25em, env(safe-area-inset-bottom));
@@ -465,7 +478,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .app-dock,
-  .quiz-flow {
+  .quiz-flow,
+  .fry-peek {
     animation: none;
   }
 
@@ -507,6 +521,28 @@ body {
   to {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fry-peek {
+  0% {
+    transform: translateY(108%);
+  }
+
+  16% {
+    transform: translateY(44%);
+  }
+
+  62% {
+    transform: translateY(44%);
+  }
+
+  80% {
+    transform: translateY(54%);
+  }
+
+  100% {
+    transform: translateY(108%);
   }
 }
 

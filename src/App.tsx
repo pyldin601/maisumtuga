@@ -25,6 +25,7 @@ export default function App() {
     <main className="page">
       {scheduleBootstrap.status === 'ready' && (
         <>
+          <img className="fry-peek" src={`${import.meta.env.BASE_URL}fry-meme-bg.png`} alt="" aria-hidden="true" />
           <AppDock
             onQuizVerbTimesChange={handleQuizVerbTimesChange}
             onQuizVerbTypeChange={handleQuizVerbTypeChange}

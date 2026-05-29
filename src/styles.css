@@ -77,6 +77,7 @@ body {
     0 0.75em 2.25em rgba(0, 0, 0, 0.18);
   font-size: clamp(0.72rem, 2.8vw, 1rem);
   transform: translateX(-50%);
+  animation: dock-slide-in 260ms ease-out both;
   backdrop-filter: blur(0.75em);
 }
 
@@ -197,6 +198,7 @@ body {
   width: min(100%, 34rem);
   height: var(--app-height);
   position: relative;
+  animation: page-content-fade-in 260ms ease-out both;
 }
 
 .quiz-flow::before {
@@ -462,6 +464,11 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .app-dock,
+  .quiz-flow {
+    animation: none;
+  }
+
   .quiz__answer-line--wrong,
   .typing-caret {
     animation: none;
@@ -478,6 +485,28 @@ body {
     top: auto;
     bottom: var(--quiz-bottom-offset);
     transform: translateY(calc(var(--row-offset) * var(--quiz-row-gap)));
+  }
+}
+
+@keyframes page-content-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dock-slide-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0.7rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 }
 

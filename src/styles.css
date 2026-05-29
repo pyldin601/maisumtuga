@@ -200,8 +200,16 @@ body {
   width: min(100%, 34rem);
   height: var(--app-height);
   position: relative;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 25%, black 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, black 25%, black 100%);
+}
+
+.quiz-flow::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 25%;
+  background: linear-gradient(to bottom, var(--black) 0, transparent 100%);
+  pointer-events: none;
 }
 
 .quiz {
@@ -224,7 +232,13 @@ body {
 .quiz__prompt p {
   margin: 0;
   color: var(--white-muted);
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-family:
+    'Avenir Next',
+    'Helvetica Neue',
+    Arial,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
   font-size: clamp(0.92rem, 3vw, 1.35rem);
   line-height: 1.4;
   white-space: nowrap;
@@ -336,10 +350,12 @@ body {
   caret-color: var(--white-strong);
   box-shadow: none;
   font:
-    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 'SFMono-Regular',
-    Consolas,
-    'Liberation Mono',
-    monospace;
+    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 'Avenir Next',
+    'Helvetica Neue',
+    Arial,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
   outline: none;
 }
 
@@ -361,10 +377,12 @@ body {
   pointer-events: none;
   white-space: nowrap;
   font:
-    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 'SFMono-Regular',
-    Consolas,
-    'Liberation Mono',
-    monospace;
+    400 clamp(1.5rem, 5vw, 2.35rem) / 1.2 'Avenir Next',
+    'Helvetica Neue',
+    Arial,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
 }
 
 .answer-text {

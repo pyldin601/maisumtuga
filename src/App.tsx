@@ -2,12 +2,14 @@ import { useState } from 'react';
 
 import AppDock from './components/dock/AppDock';
 import VerbQuizSession from './components/quiz/VerbQuizSession';
-import { readQuizVerbTimes, readQuizVerbType, writeQuizVerbTimes, writeQuizVerbType, type QuizVerbType } from './state';
+import { useScheduleBootstrap } from './hooks/useScheduleBootstrap.ts';
+import { readQuizVerbTimes, readQuizVerbType, type QuizVerbType, writeQuizVerbTimes, writeQuizVerbType } from './state';
 import type { VerbTimeShortName } from './data/verbTypes.ts';
 
 export default function App() {
   const [quizVerbType, setQuizVerbType] = useState(readQuizVerbType);
   const [quizVerbTimes, setQuizVerbTimes] = useState(readQuizVerbTimes);
+  const scheduleBootstrap = useScheduleBootstrap();
 
   function handleQuizVerbTypeChange(nextQuizVerbType: QuizVerbType): void {
     setQuizVerbType(nextQuizVerbType);
@@ -21,13 +23,21 @@ export default function App() {
 
   return (
     <main className="page">
-      <AppDock
-        onQuizVerbTimesChange={handleQuizVerbTimesChange}
-        onQuizVerbTypeChange={handleQuizVerbTypeChange}
-        quizVerbTimes={quizVerbTimes}
-        quizVerbType={quizVerbType}
-      />
-      <VerbQuizSession quizVerbTimes={quizVerbTimes} quizVerbType={quizVerbType} />
+      {scheduleBootstrap.status === 'ready' && (
+        <>
+          <AppDock
+            onQuizVerbTimesChange={handleQuizVerbTimesChange}
+            onQuizVerbTypeChange={handleQuizVerbTypeChange}
+            quizVerbTimes={quizVerbTimes}
+            quizVerbType={quizVerbType}
+          />
+          <VerbQuizSession
+            leitnerState={scheduleBootstrap.leitnerState}
+            quizVerbTimes={quizVerbTimes}
+            quizVerbType={quizVerbType}
+          />
+        </>
+      )}
     </main>
   );
 }
